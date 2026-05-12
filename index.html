@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Alarme Inteligente - Relógio Corrigido</title>
+    <title>Painel de Alarme Inteligente - Versão Final</title>
     <style>
-        /* --- ESTILOS (Mantidos) --- */
+        /* --- ESTILOS --- */
         :root {
             --bg-color: #121212;
             --panel-bg: #1e1e1e;
@@ -30,6 +30,30 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+        }
+
+        /* TELA INICIAL (PERMISSÕES) */
+        #startOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        #startBtn {
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            background: var(--primary);
+            color: black;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            animation: pulse 2s infinite;
         }
 
         header { text-align: center; margin-bottom: 20px; width: 100%; max-width: 800px; }
@@ -102,17 +126,18 @@
         .audio-mode.active { display: block; }
 
         /* Botões */
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 10px; }
         .btn-primary { background-color: var(--primary); color: #000; }
         .btn-primary:hover { filter: brightness(1.1); }
         .btn-record { background-color: var(--error); color: white; }
         .btn-record.recording { animation: pulse 1.5s infinite; }
         .btn-stop-record { background-color: #555; color: white; display: none; }
+        .btn-file { background-color: #333; color: #fff; border: 1px solid #555; }
 
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(207, 102, 121, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(207, 102, 121, 0); }
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(187, 134, 252, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(187, 134, 252, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(187, 134, 252, 0); }
         }
 
         /* Lista */
@@ -147,9 +172,25 @@
         .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 5px; border-left: 4px solid var(--secondary); transform: translateY(100px); transition: transform 0.3s; z-index: 2000; max-width: 300px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .toast.show { transform: translateY(0); }
         .toast.error { border-left-color: var(--error); }
+
+        .backup-section {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Tela de Permissões Inicial -->
+    <div id="startOverlay">
+        <h1 style="color: var(--secondary); margin-bottom: 20px;">🔊 Painel de Alarme</h1>
+        <p style="color: #ccc; max-width: 400px; margin-bottom: 30px; line-height: 1.5;">
+            Este aplicativo precisa de permissão para tocar som e acessar seu microfone.<br>
+            <strong>Clique abaixo para iniciar.</strong>
+        </p>
+        <button id="startBtn">🚀 Iniciar Aplicativo</button>
+    </div>
 
     <header>
         <div class="clock-container" id="digitalClock">00:00:00</div>
@@ -181,10 +222,10 @@
 
                 <div id="mode-record" class="audio-mode active">
                     <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--text-muted);">
-                        Grave áudios curtos (max 15s) para economizar memória.
+                        O navegador vai pedir permissão agora. Se não pedir, verifique as configurações.
                     </p>
                     <div style="display: flex; gap: 10px;">
-                        <button id="btnStartRecord" class="btn btn-record">🎤 Gravar</button>
+                        <button id="btnStartRecord" class="btn btn-record">🎤 Gravar Áudio</button>
                         <button id="btnStopRecord" class="btn btn-stop-record">⏹ Parar</button>
                     </div>
                     <div id="recordStatus" style="margin-top: 10px; font-size: 0.8rem; color: var(--secondary);"></div>
@@ -192,7 +233,7 @@
                 </div>
 
                 <div id="mode-ai" class="audio-mode">
-                    <label>Escolha a Voz</label>
+                    <label>Escolha a Voz (Feminina Prioritária)</label>
                     <select id="voiceSelect"><option value="">Carregando vozes...</option></select>
                     <label style="margin-top: 10px;">Frase para a IA</label>
                     <textarea id="aiPhrase" rows="2" style="resize: none;" placeholder="Bom dia!">Bom dia! Hora de acordar!</textarea>
@@ -201,7 +242,14 @@
             </div>
 
             <button class="btn btn-primary" onclick="saveAlarm()">💾 Salvar Alarme</button>
-            <button class="btn" style="margin-top: 10px; background-color: #333; color: #888;" onclick="clearDatabase()">🗑️ Limpar Tudo</button>
+            <button class="btn btn-file" onclick="clearDatabase()">🗑️ Limpar Banco de Dados</button>
+
+            <div class="backup-section">
+                <label>💾 Backup de Arquivos</label>
+                <button class="btn btn-file" onclick="exportData()">📥 Baixar Backup (.json)</button>
+                <button class="btn btn-file" onclick="document.getElementById('importFile').click()">📤 Carregar Backup</button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(this)">
+            </div>
         </section>
 
         <!-- Lista de Alarmes -->
@@ -240,25 +288,46 @@
         let activeAlarmSound = null;
         let activeSpeech = null;
         let alarmTimeout = null;
-        let userInteracted = false;
+        let userInteracted = false; // Flag crucial para áudio
 
-        // --- INICIALIZAÇÃO ---
-        document.addEventListener('DOMContentLoaded', () => {
-            initClock(); // Inicia relógio primeiro
+        // --- INICIALIZAÇÃO COM PERMISSÃO ---
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            // Desbloqueia o áudio do contexto do navegador
+            userInteracted = true;
+            
+            // Remove overlay
+            document.getElementById('startOverlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('startOverlay').style.display = 'none';
+            }, 500);
+
+            // Tenta solicitar permissão de microfone preventivamente
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                try {
+                    // Pede permissão silenciosa apenas para desbloquear a lógica
+                    await navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                        stream.getTracks().forEach(track => track.stop()); // Fecha imediatamente, só queria a permissão
+                        showToast("Microfone liberado com sucesso!");
+                    });
+                } catch (e) {
+                    console.log("Microfone negado ou indisponível", e);
+                    showToast("Permissão de microfone negada. A gravação pode falhar.", true);
+                }
+            }
+
+            // Inicia o app
+            initClock(); 
             initVoices();
             
-            // Tentar carregar dados, se falhar, inicia vazio para não quebrar
             try {
                 alarms = JSON.parse(localStorage.getItem('myAlarms')) || [];
             } catch (e) {
-                console.error("Erro ao carregar banco de dados", e);
+                console.error("Erro ao carregar banco", e);
                 alarms = [];
             }
             
             renderAlarms();
             updateNextAlarmDisplay();
-
-            document.body.addEventListener('click', () => { userInteracted = true; }, { once: true });
 
             document.getElementById('btnStartRecord').addEventListener('click', startRecording);
             document.getElementById('btnStopRecord').addEventListener('click', stopRecording);
@@ -267,58 +336,34 @@
             document.getElementById('alarmTime').value = now.toTimeString().substring(0,5);
         });
 
-        // --- RELÓGIO (CORRIGIDO E PROTEGIDO) ---
+        // --- RELÓGIO ---
         function initClock() {
             const clockEl = document.getElementById('digitalClock');
             const dateEl = document.getElementById('dateDisplay');
             
-            // Verificação de segurança
-            if (!clockEl || !dateEl) {
-                console.error("Erro fatal: Elementos do relógio não encontrados no HTML.");
-                return;
-            }
+            if (!clockEl || !dateEl) return;
 
-            // Loop seguro
             setInterval(() => {
                 try {
                     const now = new Date();
-                    
-                    // Atualizar o Relógio
                     clockEl.innerText = now.toLocaleTimeString('pt-BR');
-                    
-                    // Atualizar a Data
-                    dateEl.innerText = now.toLocaleDateString('pt-BR', { 
-                        weekday: 'long', 
-                        day: 'numeric', 
-                        month: 'long' 
-                    });
-                    
-                    // Chamar verificação de alarmes (isolada)
+                    dateEl.innerText = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
                     checkAlarms(now);
-                    
-                } catch (error) {
-                    console.error("Erro no loop do relógio (mas relógio continuará rodando):", error);
-                }
+                } catch (error) { console.error(error); }
             }, 1000);
-            
-            // Chamada imediata para não esperar 1 segundo
             clockEl.innerText = new Date().toLocaleTimeString('pt-BR');
         }
 
         // --- LÓGICA DE ALARMES ---
         function checkAlarms(now) {
-            if (!Array.isArray(alarms)) return; // Segurança extra
-
-            const currentDateTimeStr = now.toISOString().substring(0, 16); // Ex: 2023-10-27T14:00
-            const currentTimeStr = currentDateTimeStr.substring(11, 16); // Ex: 14:00
+            if (!Array.isArray(alarms)) return;
+            const currentDateTimeStr = now.toISOString().substring(0, 16);
+            const currentTimeStr = currentDateTimeStr.substring(11, 16);
 
             alarms.forEach(alarm => {
-                // Segurança: Se o alarme não tiver as propriedades esperadas, ignora
                 if (!alarm || !alarm.time) return;
                 if (!alarm.active) return;
-
                 const alarmDateTimeToday = currentDateTimeStr.substring(0, 11) + alarm.time;
-                
                 if (currentTimeStr === alarm.time && alarm.lastTriggered !== alarmDateTimeToday) {
                     triggerAlarm(alarm);
                     alarm.lastTriggered = alarmDateTimeToday;
@@ -330,10 +375,8 @@
         function updateNextAlarmDisplay() {
             const display = document.getElementById('nextAlarmDisplay');
             if (!display) return;
-            
             const now = new Date();
             const currentMinutes = now.getHours() * 60 + now.getMinutes();
-            
             let nextAlarm = null;
             let minDiff = Infinity;
 
@@ -342,37 +385,47 @@
                     if (!a || !a.active) return;
                     const [h, m] = a.time.split(':').map(Number);
                     if (isNaN(h) || isNaN(m)) return;
-                    
                     const alarmMinutes = h * 60 + m;
                     let diff = alarmMinutes - currentMinutes;
                     if (diff < 0) diff += 1440; 
-                    
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        nextAlarm = a;
-                    }
+                    if (diff < minDiff) { minDiff = diff; nextAlarm = a; }
                 });
             }
-
-            if (nextAlarm) {
-                display.innerText = `⏰ Próximo: ${nextAlarm.time} - ${nextAlarm.label}`;
-            } else {
-                display.innerText = "";
-            }
+            display.innerText = nextAlarm ? `⏰ Próximo: ${nextAlarm.time} - ${nextAlarm.label}` : "";
         }
 
-        // --- VOZES (IA) ---
+        // --- VOZES (FEMININA PRIORITÁRIA) ---
         function initVoices() {
             const populate = () => {
                 voices = window.speechSynthesis.getVoices();
                 const select = document.getElementById('voiceSelect');
                 if(!select) return;
                 select.innerHTML = '';
-                voices.sort((a,b) => (a.lang.includes('pt') ? -1 : 1));
+                
+                // Lista de palavras chave para identificar voz feminina ou PT-BR
+                const femaleKeywords = ['Female', 'Maria', 'Fernanda', 'Beatriz', 'Helena', 'Google português do Brasil', 'Microsoft Maria', 'Microsoft Zira'];
+                
+                // Ordenar: Vozes femininas primeiro, depois PT-BR, depois o resto
+                voices.sort((a, b) => {
+                    const aIsFemale = femaleKeywords.some(k => a.name.includes(k));
+                    const bIsFemale = femaleKeywords.some(k => b.name.includes(k));
+                    if (aIsFemale && !bIsFemale) return -1;
+                    if (!aIsFemale && bIsFemale) return 1;
+                    
+                    const aIsPT = a.lang.includes('pt');
+                    const bIsPT = b.lang.includes('pt');
+                    if (aIsPT && !bIsPT) return -1;
+                    if (!aIsPT && bIsPT) return 1;
+                    
+                    return 0;
+                });
+
                 voices.forEach(v => {
                     const opt = document.createElement('option');
                     opt.value = v.name;
-                    opt.textContent = `${v.name} (${v.lang})`;
+                    // Adiciona ícone feminino se detectado
+                    const icon = femaleKeywords.some(k => v.name.includes(k)) ? '👩' : '👤';
+                    opt.textContent = `${icon} ${v.name} (${v.lang})`;
                     select.appendChild(opt);
                 });
             };
@@ -401,33 +454,25 @@
                 showToast("Erro: Navegador não suporta microfone.", true);
                 return;
             }
-
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
                 audioChunks = [];
-
                 mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                
                 mediaRecorder.onstop = () => {
                     const blob = new Blob(audioChunks, { type: 'audio/webm' });
                     currentAudioBlob = blob;
-                    
                     const reader = new FileReader();
                     reader.readAsDataURL(blob);
                     reader.onloadend = () => {
                         currentAudioBase64 = reader.result;
                         const preview = document.getElementById('audioPreview');
-                        if(preview) {
-                            preview.src = currentAudioBase64;
-                            preview.style.display = 'block';
-                        }
+                        if(preview) { preview.src = currentAudioBase64; preview.style.display = 'block'; }
                         const status = document.getElementById('recordStatus');
-                        if(status) status.innerText = "Gravação pronta!";
+                        if(status) status.innerText = "Gravação salva!";
                     };
                     stream.getTracks().forEach(t => t.stop());
                 };
-
                 mediaRecorder.start();
                 
                 const btnStart = document.getElementById('btnStartRecord');
@@ -437,12 +482,12 @@
 
                 if(btnStart) btnStart.style.display = 'none';
                 if(btnStop) btnStop.style.display = 'inline-flex';
-                if(status) status.innerText = "Gravando...";
+                if(status) status.innerText = "🔴 Gravando...";
                 if(preview) preview.style.display = 'none';
 
             } catch (err) {
                 console.error(err);
-                showToast("Erro ao acessar microfone.", true);
+                showToast("Erro ao gravar. Verifique se clicou no botão Iniciar.", true);
             }
         }
 
@@ -451,16 +496,12 @@
                 mediaRecorder.stop();
                 const btnStart = document.getElementById('btnStartRecord');
                 const btnStop = document.getElementById('btnStopRecord');
-                
-                if(btnStart) {
-                    btnStart.style.display = 'inline-flex';
-                    btnStart.innerText = "🎤 Re gravar";
-                }
+                if(btnStart) { btnStart.style.display = 'inline-flex'; btnStart.innerText = "🎤 Re gravar"; }
                 if(btnStop) btnStop.style.display = 'none';
             }
         }
 
-        // --- GERENCIAMENTO DE DADOS ---
+        // --- MANIPULAÇÃO DE DADOS ---
         function switchTab(mode) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.audio-mode').forEach(m => m.classList.remove('active'));
@@ -478,7 +519,6 @@
         function saveAlarm() {
             const timeInput = document.getElementById('alarmTime');
             const labelInput = document.getElementById('alarmLabel');
-            
             if (!timeInput || !labelInput) return;
             
             const time = timeInput.value;
@@ -487,37 +527,17 @@
             let soundData = null;
 
             if (isRecord) {
-                if (!currentAudioBase64) {
-                    showToast("Por favor, grave um áudio primeiro.", true);
-                    return;
-                }
-                if (currentAudioBase64.length > 1500000) {
-                    showToast("Áudio muito longo! Grave algo mais curto (max 15s).", true);
-                    return;
-                }
+                if (!currentAudioBase64) { showToast("Grave um áudio primeiro.", true); return; }
+                if (currentAudioBase64.length > 1500000) { showToast("Áudio muito longo.", true); return; }
                 soundData = { type: 'audio', src: currentAudioBase64 };
             } else {
                 const phraseInput = document.getElementById('aiPhrase');
                 const voiceInput = document.getElementById('voiceSelect');
-                
                 if(!phraseInput || !voiceInput) return;
-
-                soundData = {
-                    type: 'tts',
-                    text: phraseInput.value,
-                    voice: voiceInput.value
-                };
+                soundData = { type: 'tts', text: phraseInput.value, voice: voiceInput.value };
             }
 
-            const newAlarm = {
-                id: Date.now(),
-                time,
-                label,
-                sound: soundData,
-                active: true,
-                lastTriggered: null 
-            };
-
+            const newAlarm = { id: Date.now(), time, label, sound: soundData, active: true, lastTriggered: null };
             alarms.push(newAlarm);
             
             try {
@@ -529,19 +549,51 @@
                 currentAudioBase64 = null;
                 const preview = document.getElementById('audioPreview');
                 if(preview) preview.style.display = 'none';
-            } catch (e) {
-                console.error(e);
-                if (e.name === 'QuotaExceededError') {
-                    showToast("Memória cheia! Apague alarmes com áudio.", true);
-                } else {
-                    showToast("Erro ao salvar.", true);
-                }
-            }
+            } catch (e) { showToast("Erro ao salvar.", true); }
         }
 
         function saveToDb(silent = false) {
             localStorage.setItem('myAlarms', JSON.stringify(alarms));
-            if (!silent) showToast("Banco de dados atualizado.");
+            if (!silent) showToast("Dados salvos automaticamente.");
+        }
+
+        // --- BACKUP E ARQUIVOS ---
+        function exportData() {
+            if (alarms.length === 0) { showToast("Não há alarmes para salvar.", true); return; }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(alarms));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "backup_alarmes_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedAlarms = JSON.parse(e.target.result);
+                    if (Array.isArray(importedAlarms)) {
+                        if(confirm("Deseja substituir todos os alarmes atuais pelos do arquivo?")) {
+                            alarms = importedAlarms;
+                            saveToDb();
+                            renderAlarms();
+                            updateNextAlarmDisplay();
+                            showToast("Backup carregado com sucesso!");
+                        }
+                    } else {
+                        showToast("Arquivo inválido.", true);
+                    }
+                } catch(err) {
+                    showToast("Erro ao ler arquivo.", true);
+                }
+            };
+            reader.readAsText(file);
+            // Reset input para permitir carregar o mesmo arquivo de novo
+            input.value = '';
         }
 
         function clearDatabase() {
@@ -577,17 +629,10 @@
             const list = document.getElementById('alarmList');
             const empty = document.getElementById('emptyState');
             if (!list || !empty) return;
-
             list.innerHTML = '';
-            
-            if (alarms.length === 0) { 
-                empty.style.display = 'block'; 
-                return; 
-            }
+            if (alarms.length === 0) { empty.style.display = 'block'; return; }
             empty.style.display = 'none';
-
             alarms.sort((a, b) => a.time.localeCompare(b.time));
-
             alarms.forEach(a => {
                 const li = document.createElement('li');
                 li.className = `alarm-item ${a.active ? '' : 'inactive'}`;
@@ -615,25 +660,15 @@
             const modal = document.getElementById('alarmModal');
             const labelEl = document.getElementById('modalLabel');
             const infoEl = document.getElementById('modalSoundInfo');
-            
             if(!modal || !labelEl || !infoEl) return;
-
             labelEl.innerText = alarm.label;
             infoEl.innerText = alarm.sound.type === 'audio' ? "Tocando sua gravação..." : `IA: "${alarm.sound.text}"`;
             modal.classList.add('active');
-
             if (alarm.sound.type === 'audio') {
                 if (activeAlarmSound) activeAlarmSound.pause();
                 activeAlarmSound = new Audio(alarm.sound.src);
                 activeAlarmSound.loop = true;
-                
-                const playPromise = activeAlarmSound.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.error("Autoplay impedido:", error);
-                        showToast("Toque na tela para ativar o áudio", true);
-                    });
-                }
+                activeAlarmSound.play().catch(e => { console.error(e); showToast("Toque na tela para ouvir", true); });
             } else {
                 window.speechSynthesis.cancel();
                 activeSpeech = new SpeechSynthesisUtterance(alarm.sound.text);
@@ -641,11 +676,8 @@
                     const v = voices.find(x => x.name === alarm.sound.voice);
                     if (v) activeSpeech.voice = v;
                 }
-                
                 activeSpeech.onend = () => {
-                    if (modal.classList.contains('active')) {
-                        setTimeout(() => window.speechSynthesis.speak(activeSpeech), 1000);
-                    }
+                    if (modal.classList.contains('active')) setTimeout(() => window.speechSynthesis.speak(activeSpeech), 1000);
                 };
                 window.speechSynthesis.speak(activeSpeech);
             }
@@ -654,12 +686,8 @@
         function stopAlarm() {
             const modal = document.getElementById('alarmModal');
             if(!modal) return;
-
             modal.classList.remove('active');
-            if (activeAlarmSound) {
-                activeAlarmSound.pause();
-                activeAlarmSound = null;
-            }
+            if (activeAlarmSound) { activeAlarmSound.pause(); activeAlarmSound = null; }
             if (activeSpeech || alarmTimeout) {
                 window.speechSynthesis.cancel();
                 clearTimeout(alarmTimeout);
@@ -675,15 +703,7 @@
             const now = new Date();
             now.setMinutes(now.getMinutes() + 5);
             const timeStr = now.toTimeString().substring(0,5);
-            
-            const snooze = {
-                id: Date.now(),
-                time: timeStr,
-                label: "Soneca ⏰",
-                sound: alarms.length ? alarms[alarms.length-1].sound : { type: 'tts', text: 'Acordou?', voice: '' },
-                active: true,
-                lastTriggered: null
-            };
+            const snooze = { id: Date.now(), time: timeStr, label: "Soneca ⏰", sound: alarms.length ? alarms[alarms.length-1].sound : { type: 'tts', text: 'Acordou?', voice: '' }, active: true, lastTriggered: null };
             alarms.push(snooze);
             saveToDb();
             renderAlarms();
