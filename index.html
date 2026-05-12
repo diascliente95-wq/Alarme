@@ -15,1248 +15,1423 @@
             --fg: #f0ece4;
             --muted: #7a7680;
             --accent: #e8a849;
-            --accent-glow: rgba(232, 168, 73, 0.3);
+            --accent-glow: rgba(232,168,73,0.3);
             --danger: #e85454;
             --success: #49e89a;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg);
-            color: var(--fg);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
-        .bg-layer { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .bg-blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.15; animation: blobFloat 12s ease-in-out infinite alternate; }
-        .bg-blob:nth-child(1) { width: 500px; height: 500px; background: var(--accent); top: -10%; left: -10%; }
-        .bg-blob:nth-child(2) { width: 400px; height: 400px; background: #e85454; bottom: -15%; right: -5%; animation-delay: -4s; animation-duration: 15s; }
-        .bg-blob:nth-child(3) { width: 300px; height: 300px; background: #49e89a; top: 50%; left: 60%; animation-delay: -8s; animation-duration: 18s; }
-        @keyframes blobFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(30px, -40px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.95); }
-            100% { transform: translate(15px, -15px) scale(1.05); }
-        }
-        .bg-grid {
-            position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            background-image: linear-gradient(rgba(232,168,73,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(232,168,73,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-        }
-        .particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-        .particle { position: absolute; width: 2px; height: 2px; background: var(--accent); border-radius: 50%; opacity: 0; animation: particleDrift linear infinite; }
-        @keyframes particleDrift {
-            0% { opacity: 0; transform: translateY(100vh) scale(0); }
-            10% { opacity: 0.6; } 90% { opacity: 0.6; }
-            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
-        }
-        .app { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 40px 20px 80px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-        .header { text-align: center; margin-bottom: 40px; width: 100%; }
-        .header-icon {
-            width: 56px; height: 56px; border-radius: 16px;
-            background: linear-gradient(135deg, var(--accent), #d4892e);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 16px; font-size: 24px; color: #0a0a0c;
-            box-shadow: 0 8px 32px var(--accent-glow);
-        }
-        .header h1 {
-            font-family: 'Orbitron', monospace; font-weight: 900;
-            font-size: clamp(24px, 5vw, 36px); letter-spacing: 3px;
-            background: linear-gradient(135deg, var(--fg), var(--accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .header p { color: var(--muted); font-weight: 300; font-size: 14px; margin-top: 6px; letter-spacing: 1px; }
-        .clock-container { position: relative; margin-bottom: 40px; width: 100%; }
-        .clock-ring {
-            width: 280px; height: 280px; border-radius: 50%; margin: 0 auto; position: relative;
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle, var(--card) 0%, var(--bg2) 100%);
-            border: 2px solid var(--border);
-            box-shadow: 0 0 60px rgba(0,0,0,0.5), inset 0 0 40px rgba(0,0,0,0.3);
-        }
-        .clock-ring::before {
-            content: ''; position: absolute; inset: -3px; border-radius: 50%; z-index: -1;
-            background: conic-gradient(from 0deg, transparent 0%, var(--accent) var(--seconds-pct, 0%), transparent var(--seconds-pct, 0%));
-            animation: ringPulse 2s ease-in-out infinite;
-        }
-        @keyframes ringPulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
-        .clock-marks { position: absolute; inset: 8px; border-radius: 50%; }
-        .clock-mark { position: absolute; width: 2px; height: 10px; background: var(--muted); top: 0; left: 50%; transform-origin: 50% 132px; opacity: 0.4; }
-        .clock-mark.major { height: 16px; width: 3px; background: var(--accent); opacity: 0.8; }
-        .clock-time { text-align: center; z-index: 1; }
-        .clock-time .time { font-family: 'Orbitron', monospace; font-weight: 900; font-size: 48px; letter-spacing: 4px; color: var(--fg); }
-        .clock-time .time .sep { color: var(--accent); animation: blink 1s step-end infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-        .clock-time .date { font-size: 13px; color: var(--muted); font-weight: 300; margin-top: 4px; letter-spacing: 2px; text-transform: uppercase; }
-        .config-panel {
-            width: 100%; background: var(--card); border: 1px solid var(--border);
-            border-radius: 20px; padding: 28px; margin-bottom: 24px; backdrop-filter: blur(20px);
-        }
-        .config-panel h2 {
-            font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700;
-            letter-spacing: 3px; text-transform: uppercase; color: var(--accent);
-            margin-bottom: 24px; display: flex; align-items: center; gap: 10px;
-        }
-        .config-panel h2 i { font-size: 16px; }
-        .time-picker-row { display: flex; gap: 12px; align-items: center; justify-content: center; margin-bottom: 20px; }
-        .time-input-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-        .time-input-group label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
-        .time-spinner { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .spin-btn {
-            width: 52px; height: 28px; background: var(--bg2); border: 1px solid var(--border);
-            border-radius: 8px; color: var(--muted); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 12px;
-        }
-        .spin-btn:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); transform: scale(1.05); }
-        .spin-btn:active { transform: scale(0.95); }
-        .time-value { font-family: 'Orbitron', monospace; font-size: 36px; font-weight: 900; color: var(--fg); width: 70px; text-align: center; line-height: 1; }
-        .time-sep { font-family: 'Orbitron', monospace; font-size: 36px; font-weight: 900; color: var(--accent); margin-top: 18px; }
-        .label-input, .voice-select, .msg-input {
-            width: 100%; padding: 12px 16px; background: var(--bg2); border: 1px solid var(--border);
-            border-radius: 12px; color: var(--fg); font-family: 'Outfit', sans-serif; font-size: 14px;
-            outline: none; transition: border-color 0.3s;
-        }
-        .label-input { margin-bottom: 16px; }
-        .label-input::placeholder, .msg-input::placeholder { color: var(--muted); }
-        .label-input:focus, .voice-select:focus, .msg-input:focus { border-color: var(--accent); }
-        .voice-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: stretch; }
-        .voice-select {
-            flex: 1; cursor: pointer; margin-bottom: 0; appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237a7680' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 16px center;
-        }
-        .voice-select option { background: var(--card); color: var(--fg); }
-        .btn-test-voice {
-            padding: 12px 18px; background: var(--bg2); border: 1px solid var(--border);
-            border-radius: 12px; color: var(--accent); cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; gap: 8px; font-family: 'Outfit', sans-serif;
-            font-size: 13px; white-space: nowrap; flex-shrink: 0;
-        }
-        .btn-test-voice:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-        .btn-test-voice.playing { background: var(--accent); color: var(--bg); border-color: var(--accent); animation: testPulse 0.8s ease-in-out infinite alternate; }
-        @keyframes testPulse { from { box-shadow: 0 0 0 0 var(--accent-glow); } to { box-shadow: 0 0 16px 4px var(--accent-glow); } }
-        .voice-status { font-size: 11px; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; min-height: 18px; }
-        .voice-status.ready { color: var(--success); }
-        .voice-status.loading { color: var(--accent); }
-        .voice-status.error { color: var(--danger); }
-        .voice-status .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-        .msg-input { margin-bottom: 8px; resize: vertical; min-height: 60px; }
-        .ai-hint { font-size: 11px; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
-        .ai-hint i { color: var(--accent); font-size: 13px; }
-        .btn-add {
-            width: 100%; padding: 14px 24px;
-            background: linear-gradient(135deg, var(--accent), #d4892e);
-            border: none; border-radius: 12px; color: #0a0a0c;
-            font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700;
-            letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
-            transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
-            box-shadow: 0 4px 20px var(--accent-glow);
-        }
-        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 32px var(--accent-glow); }
-        .btn-add:active { transform: translateY(0) scale(0.98); }
-        .alarms-panel { width: 100%; }
-        .alarms-panel h2 {
-            font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700;
-            letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
-            margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
-        }
-        .alarm-count { background: var(--accent); color: var(--bg); width: 22px; height: 22px; border-radius: 6px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 900; }
-        .alarms-list { display: flex; flex-direction: column; gap: 10px; }
-        .alarm-card {
-            background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-            padding: 18px 20px; display: flex; align-items: center; gap: 16px;
-            transition: all 0.3s; animation: slideIn 0.4s ease-out;
-        }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .alarm-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        .alarm-card.active { border-color: var(--success); background: linear-gradient(135deg, var(--card), rgba(73,232,154,0.05)); }
-        .alarm-card.ringing { border-color: var(--danger); animation: ringShake 0.5s ease-in-out infinite alternate, slideIn 0.4s ease-out; box-shadow: 0 0 30px rgba(232,84,84,0.3); }
-        @keyframes ringShake { 0% { transform: translateX(-3px); } 100% { transform: translateX(3px); } }
-        .alarm-time-display { font-family: 'Orbitron', monospace; font-size: 28px; font-weight: 900; color: var(--fg); min-width: 100px; }
-        .alarm-card.active .alarm-time-display { color: var(--success); }
-        .alarm-card.ringing .alarm-time-display { color: var(--danger); }
-        .alarm-info { flex: 1; min-width: 0; }
-        .alarm-label-text { font-size: 14px; font-weight: 600; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .alarm-msg-preview { font-size: 12px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .alarm-voice-badge { font-size: 10px; color: var(--accent); background: rgba(232,168,73,0.1); padding: 2px 8px; border-radius: 20px; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
-        .alarm-actions { display: flex; align-items: center; gap: 8px; }
-        .toggle {
-            width: 44px; height: 24px; background: var(--bg2); border: 1px solid var(--border);
-            border-radius: 12px; cursor: pointer; position: relative; transition: all 0.3s; flex-shrink: 0;
-        }
-        .toggle.on { background: var(--success); border-color: var(--success); }
-        .toggle::after { content: ''; width: 18px; height: 18px; background: var(--fg); border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s; }
-        .toggle.on::after { transform: translateX(20px); }
-        .btn-delete {
-            width: 34px; height: 34px; background: transparent; border: 1px solid var(--border);
-            border-radius: 8px; color: var(--muted); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 13px; flex-shrink: 0;
-        }
-        .btn-delete:hover { background: var(--danger); color: var(--fg); border-color: var(--danger); }
-        .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
-        .empty-state i { font-size: 40px; margin-bottom: 16px; opacity: 0.3; }
-        .empty-state p { font-size: 14px; font-weight: 300; }
-
-        /* Notificacao de alarme adicionado */
-        .notify-card {
-            position: fixed; top: -300px; left: 50%; transform: translateX(-50%);
-            z-index: 150; width: 90%; max-width: 420px;
-            background: var(--card); border: 1px solid var(--success);
-            border-radius: 16px; padding: 20px 24px;
-            box-shadow: 0 12px 48px rgba(0,0,0,0.5), 0 0 20px rgba(73,232,154,0.15);
-            transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .notify-card.show { top: 20px; }
-        .notify-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-        .notify-title { display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', monospace; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--success); }
-        .notify-title i { font-size: 16px; animation: notifyBell 0.6s ease-in-out 3; }
-        @keyframes notifyBell { 0%,100% { transform: rotate(0); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
-        .notify-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px; transition: color 0.2s; }
-        .notify-close:hover { color: var(--fg); }
-        .notify-body { display: flex; gap: 16px; align-items: center; }
-        .notify-time-big { font-family: 'Orbitron', monospace; font-size: 36px; font-weight: 900; color: var(--success); min-width: 90px; text-align: center; }
-        .notify-details { flex: 1; min-width: 0; }
-        .notify-label-text { font-size: 15px; font-weight: 600; color: var(--fg); margin-bottom: 2px; }
-        .notify-voice-text { font-size: 11px; color: var(--accent); margin-bottom: 4px; }
-        .notify-msg-text { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .notify-progress { height: 3px; background: var(--bg2); border-radius: 2px; margin-top: 14px; overflow: hidden; }
-        .notify-progress-bar { height: 100%; background: var(--success); border-radius: 2px; animation: notifyProgress 5s linear forwards; }
-        @keyframes notifyProgress { from { width: 100%; } to { width: 0%; } }
-
-        /* Banco de Audio */
-        .audio-bank { width: 100%; margin-top: 32px; }
-        .audio-bank h2 {
-            font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700;
-            letter-spacing: 3px; text-transform: uppercase; color: var(--muted);
-            margin-bottom: 16px; display: flex; align-items: center; gap: 10px;
-        }
-        .audio-bank h2 i { color: var(--accent); }
-        .audio-count { background: var(--accent); color: var(--bg); width: 22px; height: 22px; border-radius: 6px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 900; }
-        .record-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: stretch; flex-wrap: wrap; }
-        .sound-type-select {
-            flex: 1; min-width: 140px; padding: 12px 16px; background: var(--bg2);
-            border: 1px solid var(--border); border-radius: 12px; color: var(--fg);
-            font-family: 'Outfit', sans-serif; font-size: 14px; outline: none; cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237a7680' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; background-position: right 16px center;
-        }
-        .sound-type-select option { background: var(--card); color: var(--fg); }
-        .btn-record {
-            padding: 12px 22px; background: linear-gradient(135deg, var(--danger), #c93030);
-            border: none; border-radius: 12px; color: #fff; cursor: pointer;
-            transition: all 0.2s; display: flex; align-items: center; gap: 8px;
-            font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 600; white-space: nowrap;
-            box-shadow: 0 4px 16px rgba(232,84,84,0.3);
-        }
-        .btn-record:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(232,84,84,0.4); }
-        .btn-record:active { transform: scale(0.97); }
-        .btn-record.recording { animation: recPulse 0.8s ease-in-out infinite alternate; }
-        @keyframes recPulse { from { box-shadow: 0 0 0 0 rgba(232,84,84,0.6); } to { box-shadow: 0 0 20px 6px rgba(232,84,84,0.3); } }
-        .btn-record-all {
-            padding: 12px 18px; background: var(--bg2); border: 1px solid var(--border);
-            border-radius: 12px; color: var(--accent); cursor: pointer; transition: all 0.2s;
-            display: flex; align-items: center; gap: 8px; font-family: 'Outfit', sans-serif;
-            font-size: 13px; white-space: nowrap;
-        }
-        .btn-record-all:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-        .audio-grid { display: flex; flex-direction: column; gap: 10px; }
-        .audio-card {
-            background: var(--card); border: 1px solid var(--border); border-radius: 14px;
-            padding: 16px; display: flex; align-items: center; gap: 14px;
-            transition: all 0.3s; animation: slideIn 0.4s ease-out;
-        }
-        .audio-card:hover { border-color: var(--accent); box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        .audio-waveform { width: 80px; height: 40px; flex-shrink: 0; }
-        .audio-waveform canvas { width: 100%; height: 100%; }
-        .audio-info { flex: 1; min-width: 0; }
-        .audio-name { font-size: 13px; font-weight: 600; color: var(--fg); }
-        .audio-meta { font-size: 11px; color: var(--muted); margin-top: 2px; display: flex; gap: 10px; }
-        .audio-actions { display: flex; gap: 6px; flex-shrink: 0; }
-        .btn-audio-action {
-            width: 34px; height: 34px; background: transparent; border: 1px solid var(--border);
-            border-radius: 8px; color: var(--muted); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 13px;
-        }
-        .btn-audio-action.play:hover { background: var(--success); color: #fff; border-color: var(--success); }
-        .btn-audio-action.download:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-        .btn-audio-action.delete:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-
-        /* Overlay do alarme */
-        .alarm-overlay {
-            position: fixed; inset: 0; z-index: 100; background: rgba(10,10,12,0.92);
-            backdrop-filter: blur(20px); display: none; align-items: center; justify-content: center;
-            flex-direction: column; gap: 20px; animation: fadeIn 0.3s ease;
-        }
-        .alarm-overlay.show { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .alarm-overlay .bell-icon {
-            width: 100px; height: 100px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--danger), #c93030);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 44px; color: #fff; animation: bellRing 0.4s ease-in-out infinite alternate;
-            box-shadow: 0 0 60px rgba(232,84,84,0.5); position: relative;
-        }
-        @keyframes bellRing { 0% { transform: rotate(-12deg) scale(1); } 100% { transform: rotate(12deg) scale(1.05); } }
-        .sound-waves { position: absolute; inset: -40px; pointer-events: none; z-index: -1; }
-        .sound-wave { position: absolute; inset: 0; border: 2px solid var(--danger); border-radius: 50%; opacity: 0; animation: waveExpand 1.5s ease-out infinite; }
-        .sound-wave:nth-child(2) { animation-delay: 0.5s; }
-        .sound-wave:nth-child(3) { animation-delay: 1s; }
-        @keyframes waveExpand { 0% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(1.6); opacity: 0; } }
-        .alarm-overlay .overlay-time { font-family: 'Orbitron', monospace; font-size: 56px; font-weight: 900; color: var(--fg); letter-spacing: 4px; }
-        .alarm-overlay .overlay-label { font-size: 18px; color: var(--muted); font-weight: 300; }
-        .speaking-indicator { display: none; align-items: center; gap: 4px; height: 30px; }
-        .speaking-indicator .bar { width: 4px; background: var(--accent); border-radius: 2px; animation: speakBar 0.6s ease-in-out infinite alternate; }
-        .speaking-indicator .bar:nth-child(1) { height: 10px; animation-delay: 0s; }
-        .speaking-indicator .bar:nth-child(2) { height: 20px; animation-delay: 0.1s; }
-        .speaking-indicator .bar:nth-child(3) { height: 28px; animation-delay: 0.2s; }
-        .speaking-indicator .bar:nth-child(4) { height: 16px; animation-delay: 0.3s; }
-        .speaking-indicator .bar:nth-child(5) { height: 24px; animation-delay: 0.15s; }
-        .speaking-indicator .bar:nth-child(6) { height: 12px; animation-delay: 0.25s; }
-        .speaking-indicator .bar:nth-child(7) { height: 20px; animation-delay: 0.05s; }
-        @keyframes speakBar { 0% { transform: scaleY(0.3); } 100% { transform: scaleY(1); } }
-        .btn-dismiss {
-            padding: 16px 48px; background: linear-gradient(135deg, var(--danger), #c93030);
-            border: none; border-radius: 14px; color: #fff; font-family: 'Orbitron', monospace;
-            font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 24px rgba(232,84,84,0.4); margin-top: 8px;
-        }
-        .btn-dismiss:hover { transform: scale(1.05); box-shadow: 0 8px 40px rgba(232,84,84,0.5); }
-        .btn-dismiss:active { transform: scale(0.97); }
-        .btn-snooze {
-            padding: 12px 32px; background: transparent; border: 1px solid var(--border);
-            border-radius: 12px; color: var(--muted); font-family: 'Outfit', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.2s;
-        }
-        .btn-snooze:hover { border-color: var(--accent); color: var(--accent); }
-
-        /* Toast */
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 8px; }
-        .toast {
-            background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-            padding: 12px 20px; color: var(--fg); font-size: 13px;
-            display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4); animation: toastIn 0.4s ease-out; max-width: 340px;
-        }
-        .toast.success { border-color: var(--success); }
-        .toast.success i { color: var(--success); }
-        .toast.error { border-color: var(--danger); }
-        .toast.error i { color: var(--danger); }
-        .toast.info { border-color: var(--accent); }
-        .toast.info i { color: var(--accent); }
-        @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
-        @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(40px); } }
-
-        @media (max-width: 500px) {
-            .alarm-card { flex-wrap: wrap; padding: 14px 16px; gap: 12px; }
-            .alarm-time-display { font-size: 24px; }
-            .clock-ring { width: 220px; height: 220px; }
-            .clock-mark { transform-origin: 50% 102px; }
-            .clock-time .time { font-size: 36px; }
-            .alarm-overlay .overlay-time { font-size: 40px; }
-            .voice-row { flex-direction: column; }
-            .record-row { flex-direction: column; }
-            .notify-card { width: 95%; }
-            .notify-time-big { font-size: 28px; min-width: 70px; }
-            .audio-card { flex-wrap: wrap; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;overflow-x:hidden}
+        .bg-layer{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+        .bg-blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:0.15;animation:blobFloat 12s ease-in-out infinite alternate}
+        .bg-blob:nth-child(1){width:500px;height:500px;background:var(--accent);top:-10%;left:-10%}
+        .bg-blob:nth-child(2){width:400px;height:400px;background:#e85454;bottom:-15%;right:-5%;animation-delay:-4s;animation-duration:15s}
+        .bg-blob:nth-child(3){width:300px;height:300px;background:#49e89a;top:50%;left:60%;animation-delay:-8s;animation-duration:18s}
+        @keyframes blobFloat{0%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-40px) scale(1.1)}66%{transform:translate(-20px,20px) scale(0.95)}100%{transform:translate(15px,-15px) scale(1.05)}}
+        .bg-grid{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(232,168,73,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(232,168,73,0.03) 1px,transparent 1px);background-size:60px 60px}
+        .particles{position:fixed;inset:0;z-index:0;pointer-events:none}
+        .particle{position:absolute;width:2px;height:2px;background:var(--accent);border-radius:50%;opacity:0;animation:particleDrift linear infinite}
+        @keyframes particleDrift{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:0.6}90%{opacity:0.6}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
+        .app{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:40px 20px 80px;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+        .header{text-align:center;margin-bottom:40px;width:100%}
+        .header-icon{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,var(--accent),#d4892e);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:24px;color:#0a0a0c;box-shadow:0 8px 32px var(--accent-glow)}
+        .header h1{font-family:'Orbitron',monospace;font-weight:900;font-size:clamp(24px,5vw,36px);letter-spacing:3px;background:linear-gradient(135deg,var(--fg),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .header p{color:var(--muted);font-weight:300;font-size:14px;margin-top:6px;letter-spacing:1px}
+        .clock-container{position:relative;margin-bottom:40px;width:100%}
+        .clock-ring{width:280px;height:280px;border-radius:50%;margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,var(--card) 0%,var(--bg2) 100%);border:2px solid var(--border);box-shadow:0 0 60px rgba(0,0,0,0.5),inset 0 0 40px rgba(0,0,0,0.3)}
+        .clock-ring::before{content:'';position:absolute;inset:-3px;border-radius:50%;z-index:-1;background:conic-gradient(from 0deg,transparent 0%,var(--accent) var(--seconds-pct,0%),transparent var(--seconds-pct,0%));animation:ringPulse 2s ease-in-out infinite}
+        @keyframes ringPulse{0%,100%{opacity:0.7}50%{opacity:1}}
+        .clock-marks{position:absolute;inset:8px;border-radius:50%}
+        .clock-mark{position:absolute;width:2px;height:10px;background:var(--muted);top:0;left:50%;transform-origin:50% 132px;opacity:0.4}
+        .clock-mark.major{height:16px;width:3px;background:var(--accent);opacity:0.8}
+        .clock-time{text-align:center;z-index:1}
+        .clock-time .time{font-family:'Orbitron',monospace;font-weight:900;font-size:48px;letter-spacing:4px;color:var(--fg)}
+        .clock-time .time .sep{color:var(--accent);animation:blink 1s step-end infinite}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+        .clock-time .date{font-size:13px;color:var(--muted);font-weight:300;margin-top:4px;letter-spacing:2px;text-transform:uppercase}
+        .config-panel{width:100%;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;margin-bottom:24px;backdrop-filter:blur(20px)}
+        .config-panel h2{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:24px;display:flex;align-items:center;gap:10px}
+        .config-panel h2 i{font-size:16px}
+        .time-picker-row{display:flex;gap:12px;align-items:center;justify-content:center;margin-bottom:20px}
+        .time-input-group{display:flex;flex-direction:column;align-items:center;gap:6px}
+        .time-input-group label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--muted)}
+        .time-spinner{display:flex;flex-direction:column;align-items:center;gap:4px}
+        .spin-btn{width:52px;height:28px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:12px}
+        .spin-btn:hover{background:var(--accent);color:var(--bg);border-color:var(--accent);transform:scale(1.05)}
+        .spin-btn:active{transform:scale(0.95)}
+        .time-value{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;color:var(--fg);width:70px;text-align:center;line-height:1}
+        .time-sep{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;color:var(--accent);margin-top:18px}
+        .label-input,.voice-select,.msg-input{width:100%;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color 0.3s}
+        .label-input{margin-bottom:16px}
+        .label-input::placeholder,.msg-input::placeholder{color:var(--muted)}
+        .label-input:focus,.voice-select:focus,.msg-input:focus{border-color:var(--accent)}
+        .voice-row{display:flex;gap:10px;margin-bottom:12px;align-items:stretch}
+        .voice-select{flex:1;cursor:pointer;margin-bottom:0;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237a7680' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+        .voice-select option{background:var(--card);color:var(--fg)}
+        .btn-test-voice{padding:12px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--accent);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif;font-size:13px;white-space:nowrap;flex-shrink:0}
+        .btn-test-voice:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+        .btn-test-voice.playing{background:var(--accent);color:var(--bg);border-color:var(--accent);animation:testPulse 0.8s ease-in-out infinite alternate}
+        @keyframes testPulse{from{box-shadow:0 0 0 0 var(--accent-glow)}to{box-shadow:0 0 16px 4px var(--accent-glow)}}
+        .voice-status{font-size:11px;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:6px;min-height:18px}
+        .voice-status.ready{color:var(--success)}
+        .voice-status.loading{color:var(--accent)}
+        .voice-status.error{color:var(--danger)}
+        .voice-status .dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+        .msg-input{margin-bottom:8px;resize:vertical;min-height:60px}
+        .ai-hint{font-size:11px;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:6px}
+        .ai-hint i{color:var(--accent);font-size:13px}
+        .btn-add{width:100%;padding:14px 24px;background:linear-gradient(135deg,var(--accent),#d4892e);border:none;border-radius:12px;color:#0a0a0c;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 4px 20px var(--accent-glow)}
+        .btn-add:hover{transform:translateY(-2px);box-shadow:0 8px 32px var(--accent-glow)}
+        .btn-add:active{transform:translateY(0) scale(0.98)}
+        .alarms-panel{width:100%}
+        .alarms-panel h2{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+        .alarm-count{background:var(--accent);color:var(--bg);width:22px;height:22px;border-radius:6px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:900}
+        .alarms-list{display:flex;flex-direction:column;gap:10px}
+        .alarm-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:16px;transition:all 0.3s;animation:slideIn 0.4s ease-out}
+        @keyframes slideIn{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+        .alarm-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+        .alarm-card.active{border-color:var(--success);background:linear-gradient(135deg,var(--card),rgba(73,232,154,0.05))}
+        .alarm-card.ringing{border-color:var(--danger);animation:ringShake 0.5s ease-in-out infinite alternate,slideIn 0.4s ease-out;box-shadow:0 0 30px rgba(232,84,84,0.3)}
+        @keyframes ringShake{0%{transform:translateX(-3px)}100%{transform:translateX(3px)}}
+        .alarm-time-display{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--fg);min-width:100px}
+        .alarm-card.active .alarm-time-display{color:var(--success)}
+        .alarm-card.ringing .alarm-time-display{color:var(--danger)}
+        .alarm-info{flex:1;min-width:0}
+        .alarm-label-text{font-size:14px;font-weight:600;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .alarm-msg-preview{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .alarm-voice-badge{font-size:10px;color:var(--accent);background:rgba(232,168,73,0.1);padding:2px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;margin-top:4px}
+        .alarm-actions{display:flex;align-items:center;gap:8px}
+        .toggle{width:44px;height:24px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;cursor:pointer;position:relative;transition:all 0.3s;flex-shrink:0}
+        .toggle.on{background:var(--success);border-color:var(--success)}
+        .toggle::after{content:'';width:18px;height:18px;background:var(--fg);border-radius:50%;position:absolute;top:2px;left:2px;transition:transform 0.3s}
+        .toggle.on::after{transform:translateX(20px)}
+        .btn-delete{width:34px;height:34px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:13px;flex-shrink:0}
+        .btn-delete:hover{background:var(--danger);color:var(--fg);border-color:var(--danger)}
+        .empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+        .empty-state i{font-size:40px;margin-bottom:16px;opacity:0.3}
+        .empty-state p{font-size:14px;font-weight:300}
+        .notify-card{position:fixed;top:-300px;left:50%;transform:translateX(-50%);z-index:150;width:90%;max-width:420px;background:var(--card);border:1px solid var(--success);border-radius:16px;padding:20px 24px;box-shadow:0 12px 48px rgba(0,0,0,0.5),0 0 20px rgba(73,232,154,0.15);transition:top 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+        .notify-card.show{top:20px}
+        .notify-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+        .notify-title{display:flex;align-items:center;gap:8px;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--success)}
+        .notify-title i{font-size:16px;animation:notifyBell 0.6s ease-in-out 3}
+        @keyframes notifyBell{0%,100%{transform:rotate(0)}25%{transform:rotate(15deg)}75%{transform:rotate(-15deg)}}
+        .notify-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;padding:4px;transition:color 0.2s}
+        .notify-close:hover{color:var(--fg)}
+        .notify-body{display:flex;gap:16px;align-items:center}
+        .notify-time-big{font-family:'Orbitron',monospace;font-size:36px;font-weight:900;color:var(--success);min-width:90px;text-align:center}
+        .notify-details{flex:1;min-width:0}
+        .notify-label-text{font-size:15px;font-weight:600;color:var(--fg);margin-bottom:2px}
+        .notify-voice-text{font-size:11px;color:var(--accent);margin-bottom:4px}
+        .notify-msg-text{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .notify-progress{height:3px;background:var(--bg2);border-radius:2px;margin-top:14px;overflow:hidden}
+        .notify-progress-bar{height:100%;background:var(--success);border-radius:2px;animation:notifyProgress 5s linear forwards}
+        @keyframes notifyProgress{from{width:100%}to{width:0%}}
+        .audio-bank{width:100%;margin-top:32px}
+        .audio-bank h2{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+        .audio-bank h2 i{color:var(--accent)}
+        .audio-count{background:var(--accent);color:var(--bg);width:22px;height:22px;border-radius:6px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:900}
+        .record-row{display:flex;gap:10px;margin-bottom:16px;align-items:stretch;flex-wrap:wrap}
+        .sound-type-select{flex:1;min-width:140px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--fg);font-family:'Outfit',sans-serif;font-size:14px;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237a7680' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+        .sound-type-select option{background:var(--card);color:var(--fg)}
+        .btn-record{padding:12px 22px;background:linear-gradient(135deg,var(--danger),#c93030);border:none;border-radius:12px;color:#fff;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 4px 16px rgba(232,84,84,0.3)}
+        .btn-record:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(232,84,84,0.4)}
+        .btn-record:active{transform:scale(0.97)}
+        .btn-record.recording{animation:recPulse 0.8s ease-in-out infinite alternate}
+        @keyframes recPulse{from{box-shadow:0 0 0 0 rgba(232,84,84,0.6)}to{box-shadow:0 0 20px 6px rgba(232,84,84,0.3)}}
+        .btn-record-all{padding:12px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--accent);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif;font-size:13px;white-space:nowrap}
+        .btn-record-all:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+        .audio-grid{display:flex;flex-direction:column;gap:10px}
+        .audio-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px;transition:all 0.3s;animation:slideIn 0.4s ease-out}
+        .audio-card:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+        .audio-waveform{width:80px;height:40px;flex-shrink:0}
+        .audio-waveform canvas{width:100%;height:100%}
+        .audio-info{flex:1;min-width:0}
+        .audio-name{font-size:13px;font-weight:600;color:var(--fg)}
+        .audio-meta{font-size:11px;color:var(--muted);margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
+        .audio-actions{display:flex;gap:6px;flex-shrink:0}
+        .btn-audio-action{width:34px;height:34px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:13px}
+        .btn-audio-action.play:hover{background:var(--success);color:#fff;border-color:var(--success)}
+        .btn-audio-action.download:hover{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+        .btn-audio-action.delete:hover{background:var(--danger);color:#fff;border-color:var(--danger)}
+        .alarm-overlay{position:fixed;inset:0;z-index:100;background:rgba(10,10,12,0.92);backdrop-filter:blur(20px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;animation:fadeIn 0.3s ease}
+        .alarm-overlay.show{display:flex}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .alarm-overlay .bell-icon{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--danger),#c93030);display:flex;align-items:center;justify-content:center;font-size:44px;color:#fff;animation:bellRing 0.4s ease-in-out infinite alternate;box-shadow:0 0 60px rgba(232,84,84,0.5);position:relative}
+        @keyframes bellRing{0%{transform:rotate(-12deg) scale(1)}100%{transform:rotate(12deg) scale(1.05)}}
+        .sound-waves{position:absolute;inset:-40px;pointer-events:none;z-index:-1}
+        .sound-wave{position:absolute;inset:0;border:2px solid var(--danger);border-radius:50%;opacity:0;animation:waveExpand 1.5s ease-out infinite}
+        .sound-wave:nth-child(2){animation-delay:0.5s}
+        .sound-wave:nth-child(3){animation-delay:1s}
+        @keyframes waveExpand{0%{transform:scale(0.8);opacity:0.6}100%{transform:scale(1.6);opacity:0}}
+        .alarm-overlay .overlay-time{font-family:'Orbitron',monospace;font-size:56px;font-weight:900;color:var(--fg);letter-spacing:4px}
+        .alarm-overlay .overlay-label{font-size:18px;color:var(--muted);font-weight:300}
+        .speaking-indicator{display:none;align-items:center;gap:4px;height:30px}
+        .speaking-indicator .bar{width:4px;background:var(--accent);border-radius:2px;animation:speakBar 0.6s ease-in-out infinite alternate}
+        .speaking-indicator .bar:nth-child(1){height:10px;animation-delay:0s}
+        .speaking-indicator .bar:nth-child(2){height:20px;animation-delay:0.1s}
+        .speaking-indicator .bar:nth-child(3){height:28px;animation-delay:0.2s}
+        .speaking-indicator .bar:nth-child(4){height:16px;animation-delay:0.3s}
+        .speaking-indicator .bar:nth-child(5){height:24px;animation-delay:0.15s}
+        .speaking-indicator .bar:nth-child(6){height:12px;animation-delay:0.25s}
+        .speaking-indicator .bar:nth-child(7){height:20px;animation-delay:0.05s}
+        @keyframes speakBar{0%{transform:scaleY(0.3)}100%{transform:scaleY(1)}}
+        .btn-dismiss{padding:16px 48px;background:linear-gradient(135deg,var(--danger),#c93030);border:none;border-radius:14px;color:#fff;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 24px rgba(232,84,84,0.4);margin-top:8px}
+        .btn-dismiss:hover{transform:scale(1.05);box-shadow:0 8px 40px rgba(232,84,84,0.5)}
+        .btn-dismiss:active{transform:scale(0.97)}
+        .btn-snooze{padding:12px 32px;background:transparent;border:1px solid var(--border);border-radius:12px;color:var(--muted);font-family:'Outfit',sans-serif;font-size:14px;cursor:pointer;transition:all 0.2s}
+        .btn-snooze:hover{border-color:var(--accent);color:var(--accent)}
+        .toast-container{position:fixed;top:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px}
+        .toast{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 20px;color:var(--fg);font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.4);animation:toastIn 0.4s ease-out;max-width:340px}
+        .toast.success{border-color:var(--success)}.toast.success i{color:var(--success)}
+        .toast.error{border-color:var(--danger)}.toast.error i{color:var(--danger)}
+        .toast.info{border-color:var(--accent)}.toast.info i{color:var(--accent)}
+        @keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+        @keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+        @media(max-width:500px){.alarm-card{flex-wrap:wrap;padding:14px 16px;gap:12px}.alarm-time-display{font-size:24px}.clock-ring{width:220px;height:220px}.clock-mark{transform-origin:50% 102px}.clock-time .time{font-size:36px}.alarm-overlay .overlay-time{font-size:40px}.voice-row{flex-direction:column}.record-row{flex-direction:column}.notify-card{width:95%}.notify-time-big{font-size:28px;min-width:70px}.audio-card{flex-wrap:wrap}}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}
     </style>
 </head>
 <body>
 
-    <div class="bg-layer"><div class="bg-blob"></div><div class="bg-blob"></div><div class="bg-blob"></div></div>
-    <div class="bg-grid"></div>
-    <div class="particles" id="particles"></div>
+<div class="bg-layer"><div class="bg-blob"></div><div class="bg-blob"></div><div class="bg-blob"></div></div>
+<div class="bg-grid"></div>
+<div class="particles" id="particles"></div>
+<div class="toast-container" id="toastContainer"></div>
 
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Notificacao de alarme adicionado -->
-    <div class="notify-card" id="notifyCard">
-        <div class="notify-header">
-            <div class="notify-title"><i class="fas fa-bell"></i> Alarme Adicionado</div>
-            <button class="notify-close" id="notifyClose" aria-label="Fechar notificacao">&times;</button>
-        </div>
-        <div class="notify-body">
-            <div class="notify-time-big" id="notifyTime">07:00</div>
-            <div class="notify-details">
-                <div class="notify-label-text" id="notifyLabel">Alarme</div>
-                <div class="notify-voice-text" id="notifyVoice"><i class="fas fa-microphone"></i> Voz selecionada</div>
-                <div class="notify-msg-text" id="notifyMsg">Mensagem da IA...</div>
-            </div>
-        </div>
-        <div class="notify-progress"><div class="notify-progress-bar" id="notifyProgress"></div></div>
+<div class="notify-card" id="notifyCard">
+    <div class="notify-header">
+        <div class="notify-title"><i class="fas fa-bell"></i> Alarme Adicionado</div>
+        <button class="notify-close" id="notifyClose" aria-label="Fechar">&times;</button>
     </div>
-
-    <!-- Overlay do alarme -->
-    <div class="alarm-overlay" id="alarmOverlay" role="dialog" aria-label="Alarme disparado">
-        <div class="bell-icon">
-            <i class="fas fa-bell"></i>
-            <div class="sound-waves"><div class="sound-wave"></div><div class="sound-wave"></div><div class="sound-wave"></div></div>
+    <div class="notify-body">
+        <div class="notify-time-big" id="notifyTime">07:00</div>
+        <div class="notify-details">
+            <div class="notify-label-text" id="notifyLabel">Alarme</div>
+            <div class="notify-voice-text" id="notifyVoice"><i class="fas fa-microphone"></i> Voz</div>
+            <div class="notify-msg-text" id="notifyMsg">Mensagem...</div>
         </div>
-        <div class="overlay-time" id="overlayTime">00:00</div>
-        <div class="overlay-label" id="overlayLabel">Alarme</div>
-        <div class="speaking-indicator" id="speakingIndicator">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
-        </div>
-        <button class="btn-dismiss" id="btnDismiss" aria-label="Desativar alarme"><i class="fas fa-stop"></i>&nbsp; Desativar</button>
-        <button class="btn-snooze" id="btnSnooze" aria-label="Adiar 5 minutos"><i class="fas fa-clock"></i>&nbsp; Adiar 5 min</button>
     </div>
+    <div class="notify-progress"><div class="notify-progress-bar" id="notifyProgress"></div></div>
+</div>
 
-    <main class="app">
-        <header class="header">
-            <div class="header-icon"><i class="fas fa-bell"></i></div>
-            <h1>VOICE ALARM</h1>
-            <p>Alarme com voz de IA feminina</p>
-        </header>
+<div class="alarm-overlay" id="alarmOverlay" role="dialog" aria-label="Alarme disparado">
+    <div class="bell-icon">
+        <i class="fas fa-bell"></i>
+        <div class="sound-waves"><div class="sound-wave"></div><div class="sound-wave"></div><div class="sound-wave"></div></div>
+    </div>
+    <div class="overlay-time" id="overlayTime">00:00</div>
+    <div class="overlay-label" id="overlayLabel">Alarme</div>
+    <div class="speaking-indicator" id="speakingIndicator">
+        <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+    <button class="btn-dismiss" id="btnDismiss"><i class="fas fa-stop"></i>&nbsp; Desativar</button>
+    <button class="btn-snooze" id="btnSnooze"><i class="fas fa-clock"></i>&nbsp; Adiar 5 min</button>
+</div>
 
-        <section class="clock-container" aria-label="Relogio atual">
-            <div class="clock-ring" id="clockRing">
-                <div class="clock-marks" id="clockMarks"></div>
-                <div class="clock-time">
-                    <div class="time"><span id="clockHours">00</span><span class="sep">:</span><span id="clockMinutes">00</span><span class="sep">:</span><span id="clockSeconds">00</span></div>
-                    <div class="date" id="clockDate">--</div>
+<main class="app">
+    <header class="header">
+        <div class="header-icon"><i class="fas fa-bell"></i></div>
+        <h1>VOICE ALARM</h1>
+        <p>Alarme com voz de IA feminina</p>
+    </header>
+
+    <section class="clock-container" aria-label="Relogio atual">
+        <div class="clock-ring" id="clockRing">
+            <div class="clock-marks" id="clockMarks"></div>
+            <div class="clock-time">
+                <div class="time"><span id="clockHours">00</span><span class="sep">:</span><span id="clockMinutes">00</span><span class="sep">:</span><span id="clockSeconds">00</span></div>
+                <div class="date" id="clockDate">--</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="config-panel" aria-label="Configurar alarme">
+        <h2><i class="fas fa-plus-circle"></i> Novo Alarme</h2>
+        <div class="time-picker-row">
+            <div class="time-input-group">
+                <label>Hora</label>
+                <div class="time-spinner">
+                    <button class="spin-btn" data-target="hours" data-dir="up" aria-label="Aumentar hora"><i class="fas fa-chevron-up"></i></button>
+                    <div class="time-value" id="pickerHours">07</div>
+                    <button class="spin-btn" data-target="hours" data-dir="down" aria-label="Diminuir hora"><i class="fas fa-chevron-down"></i></button>
                 </div>
             </div>
-        </section>
-
-        <section class="config-panel" aria-label="Configurar alarme">
-            <h2><i class="fas fa-plus-circle"></i> Novo Alarme</h2>
-            <div class="time-picker-row">
-                <div class="time-input-group">
-                    <label>Hora</label>
-                    <div class="time-spinner">
-                        <button class="spin-btn" data-target="hours" data-dir="up" aria-label="Aumentar hora"><i class="fas fa-chevron-up"></i></button>
-                        <div class="time-value" id="pickerHours">07</div>
-                        <button class="spin-btn" data-target="hours" data-dir="down" aria-label="Diminuir hora"><i class="fas fa-chevron-down"></i></button>
-                    </div>
-                </div>
-                <div class="time-sep">:</div>
-                <div class="time-input-group">
-                    <label>Minuto</label>
-                    <div class="time-spinner">
-                        <button class="spin-btn" data-target="minutes" data-dir="up" aria-label="Aumentar minuto"><i class="fas fa-chevron-up"></i></button>
-                        <div class="time-value" id="pickerMinutes">00</div>
-                        <button class="spin-btn" data-target="minutes" data-dir="down" aria-label="Diminuir minuto"><i class="fas fa-chevron-down"></i></button>
-                    </div>
+            <div class="time-sep">:</div>
+            <div class="time-input-group">
+                <label>Minuto</label>
+                <div class="time-spinner">
+                    <button class="spin-btn" data-target="minutes" data-dir="up" aria-label="Aumentar minuto"><i class="fas fa-chevron-up"></i></button>
+                    <div class="time-value" id="pickerMinutes">00</div>
+                    <button class="spin-btn" data-target="minutes" data-dir="down" aria-label="Diminuir minuto"><i class="fas fa-chevron-down"></i></button>
                 </div>
             </div>
-            <input type="text" class="label-input" id="alarmLabel" placeholder="Nome do alarme (ex: Acordar)" maxlength="40" aria-label="Nome do alarme">
-            <div class="voice-row">
-                <select class="voice-select" id="voiceSelect" aria-label="Selecionar voz"><option>Carregando vozes...</option></select>
-                <button class="btn-test-voice" id="btnTestVoice" aria-label="Testar voz"><i class="fas fa-play"></i> Ouvir</button>
-            </div>
-            <div class="voice-status" id="voiceStatus"><span class="dot"></span><span>Carregando vozes disponveis...</span></div>
-            <textarea class="msg-input" id="alarmMessage" placeholder="Mensagem personalizada (deixe vazio para mensagem inteligente automatica)" maxlength="200" aria-label="Mensagem da voz"></textarea>
-            <div class="ai-hint"><i class="fas fa-sparkles"></i> Sem mensagem personalizada, a IA gera um alerta contextual baseado no horario</div>
-            <button class="btn-add" id="btnAdd" aria-label="Adicionar alarme"><i class="fas fa-bell"></i> Adicionar Alarme</button>
-        </section>
+        </div>
+        <input type="text" class="label-input" id="alarmLabel" placeholder="Nome do alarme (ex: Acordar)" maxlength="40">
+        <div class="voice-row">
+            <select class="voice-select" id="voiceSelect" aria-label="Selecionar voz"><option>Carregando vozes...</option></select>
+            <button class="btn-test-voice" id="btnTestVoice"><i class="fas fa-play"></i> Ouvir</button>
+        </div>
+        <div class="voice-status" id="voiceStatus"><span class="dot"></span><span>Carregando vozes...</span></div>
+        <textarea class="msg-input" id="alarmMessage" placeholder="Mensagem personalizada (vazio = mensagem inteligente automatica)" maxlength="200"></textarea>
+        <div class="ai-hint"><i class="fas fa-sparkles"></i> Sem mensagem, a IA gera alerta contextual pelo horario</div>
+        <button class="btn-add" id="btnAdd"><i class="fas fa-bell"></i> Adicionar Alarme</button>
+    </section>
 
-        <section class="alarms-panel" aria-label="Lista de alarmes">
-            <h2><i class="fas fa-list"></i> Meus Alarmes <span class="alarm-count" id="alarmCount">0</span></h2>
-            <div class="alarms-list" id="alarmsList">
-                <div class="empty-state" id="emptyState"><i class="fas fa-bell-slash"></i><p>Nenhum alarme configurado ainda</p></div>
-            </div>
-        </section>
+    <section class="alarms-panel" aria-label="Lista de alarmes">
+        <h2><i class="fas fa-list"></i> Meus Alarmes <span class="alarm-count" id="alarmCount">0</span></h2>
+        <div class="alarms-list" id="alarmsList">
+            <div class="empty-state" id="emptyState"><i class="fas fa-bell-slash"></i><p>Nenhum alarme configurado</p></div>
+        </div>
+    </section>
 
-        <!-- Banco de Audio -->
-        <section class="audio-bank" aria-label="Banco de audio">
-            <h2><i class="fas fa-database"></i> Banco de Audio <span class="audio-count" id="audioCount">0</span></h2>
-            <div class="record-row">
-                <select class="sound-type-select" id="soundTypeSelect" aria-label="Tipo de som">
-                    <option value="padrao">Padrao (beep duplo)</option>
-                    <option value="suave">Suave (tom ascendente)</option>
-                    <option value="urgente">Urgente (rapido)</option>
-                    <option value="melodia">Melodia (musical)</option>
-                </select>
-                <button class="btn-record" id="btnRecord" aria-label="Gravar audio"><i class="fas fa-circle"></i> Gravar e Salvar</button>
-                <button class="btn-record-all" id="btnRecordAll" aria-label="Gravar todos os sons"><i class="fas fa-layer-group"></i> Gravar Todos</button>
-            </div>
-            <div class="audio-grid" id="audioGrid">
-                <div class="empty-state" id="audioEmptyState"><i class="fas fa-volume-mute"></i><p>Nenhum audio salvo ainda</p></div>
-            </div>
-        </section>
-    </main>
+    <section class="audio-bank" aria-label="Banco de audio">
+        <h2><i class="fas fa-database"></i> Banco de Audio <span class="audio-count" id="audioCount">0</span></h2>
+        <div class="record-row">
+            <select class="sound-type-select" id="soundTypeSelect">
+                <option value="padrao">Padrao (beep duplo)</option>
+                <option value="suave">Suave (tom ascendente)</option>
+                <option value="urgente">Urgente (rapido)</option>
+                <option value="melodia">Melodia (musical)</option>
+            </select>
+            <button class="btn-record" id="btnRecord"><i class="fas fa-circle"></i> Gravar e Salvar</button>
+            <button class="btn-record-all" id="btnRecordAll"><i class="fas fa-layer-group"></i> Gravar Todos</button>
+        </div>
+        <div class="audio-grid" id="audioGrid">
+            <div class="empty-state" id="audioEmptyState"><i class="fas fa-volume-mute"></i><p>Nenhum audio salvo</p></div>
+        </div>
+    </section>
+</main>
 
-    <script>
-        // ===== Estado global =====
-        let alarms = [];
-        let savedAudios = [];
-        let alarmIdCounter = 0;
-        let audioIdCounter = 0;
-        let pickerHours = 7;
-        let pickerMinutes = 0;
-        let currentRingingAlarm = null;
-        let audioCtx = null;
-        let beepTimeout = null;
-        let voicesLoaded = false;
-        let selectedVoice = null;
-        let isSpeaking = false;
-        let speakLoopTimer = null;
-        let notifyTimer = null;
-        let currentlyPlayingAudio = null;
+<script>
+/* ========================================
+   ESTADO GLOBAL
+   ======================================== */
+var alarms = [];
+var savedAudios = [];
+var alarmIdCounter = 0;
+var audioIdCounter = 0;
+var pickerHours = 7;
+var pickerMinutes = 0;
+var currentRingingAlarm = null;
+var audioCtx = null;
+var beepTimeouts = [];
+var voicesLoaded = false;
+var selectedVoice = null;
+var speakLoopTimer = null;
+var notifyTimer = null;
+var currentlyPlayingAudio = null;
+var isRecording = false;
+var db = null;
+var appStartTime = Date.now();
+var lastTriggeredMinute = -1;
 
-        // ===== Tipos de som =====
-        const SOUND_TYPES = {
-            suave: {
-                name: 'Suave', duration: 4000,
-                notes: [
-                    { time: 0, freq: 523, dur: 0.5, vol: 0.2, wave: 'sine' },
-                    { time: 0.7, freq: 659, dur: 0.5, vol: 0.2, wave: 'sine' },
-                    { time: 1.4, freq: 784, dur: 0.8, vol: 0.25, wave: 'sine' },
-                    { time: 2.6, freq: 659, dur: 0.5, vol: 0.2, wave: 'sine' },
-                    { time: 3.3, freq: 784, dur: 0.8, vol: 0.25, wave: 'sine' },
-                ]
-            },
-            padrao: {
-                name: 'Padrao', duration: 3000,
-                notes: [
-                    { time: 0, freq: 880, dur: 0.2, vol: 0.3, wave: 'sine' },
-                    { time: 0.3, freq: 1100, dur: 0.2, vol: 0.3, wave: 'sine' },
-                    { time: 0.8, freq: 880, dur: 0.2, vol: 0.3, wave: 'sine' },
-                    { time: 1.1, freq: 1100, dur: 0.2, vol: 0.3, wave: 'sine' },
-                    { time: 1.8, freq: 880, dur: 0.2, vol: 0.3, wave: 'sine' },
-                    { time: 2.1, freq: 1100, dur: 0.2, vol: 0.3, wave: 'sine' },
-                ]
-            },
-            urgente: {
-                name: 'Urgente', duration: 2500,
-                notes: Array.from({ length: 8 }, (_, i) => ({
-                    time: i * 0.25, freq: i % 2 === 0 ? 1000 : 1200, dur: 0.15, vol: 0.3, wave: 'square'
-                }))
-            },
-            melodia: {
-                name: 'Melodia', duration: 4500,
-                notes: [
-                    { time: 0, freq: 523, dur: 0.4, vol: 0.25, wave: 'sine' },
-                    { time: 0.5, freq: 587, dur: 0.4, vol: 0.25, wave: 'sine' },
-                    { time: 1.0, freq: 659, dur: 0.4, vol: 0.25, wave: 'sine' },
-                    { time: 1.5, freq: 698, dur: 0.4, vol: 0.25, wave: 'sine' },
-                    { time: 2.0, freq: 784, dur: 0.8, vol: 0.3, wave: 'sine' },
-                    { time: 3.0, freq: 784, dur: 0.4, vol: 0.25, wave: 'sine' },
-                    { time: 3.5, freq: 698, dur: 0.4, vol: 0.25, wave: 'sine' },
-                    { time: 4.0, freq: 659, dur: 0.6, vol: 0.3, wave: 'sine' },
-                ]
-            }
-        };
+/* ========================================
+   TIPOS DE SOM PARA GRAVAR
+   ======================================== */
+var SOUND_TYPES = {
+    suave: {
+        name: 'Suave', duration: 4000,
+        notes: [
+            { time: 0, freq: 523, dur: 0.5, vol: 0.2, wave: 'sine' },
+            { time: 0.7, freq: 659, dur: 0.5, vol: 0.2, wave: 'sine' },
+            { time: 1.4, freq: 784, dur: 0.8, vol: 0.25, wave: 'sine' },
+            { time: 2.6, freq: 659, dur: 0.5, vol: 0.2, wave: 'sine' },
+            { time: 3.3, freq: 784, dur: 0.8, vol: 0.25, wave: 'sine' }
+        ]
+    },
+    padrao: {
+        name: 'Padrao', duration: 3000,
+        notes: [
+            { time: 0, freq: 880, dur: 0.2, vol: 0.3, wave: 'sine' },
+            { time: 0.3, freq: 1100, dur: 0.2, vol: 0.3, wave: 'sine' },
+            { time: 0.8, freq: 880, dur: 0.2, vol: 0.3, wave: 'sine' },
+            { time: 1.1, freq: 1100, dur: 0.2, vol: 0.3, wave: 'sine' },
+            { time: 1.8, freq: 880, dur: 0.2, vol: 0.3, wave: 'sine' },
+            { time: 2.1, freq: 1100, dur: 0.2, vol: 0.3, wave: 'sine' }
+        ]
+    },
+    urgente: {
+        name: 'Urgente', duration: 2500,
+        notes: (function() {
+            var n = [];
+            for (var i = 0; i < 8; i++) n.push({ time: i * 0.25, freq: i % 2 === 0 ? 1000 : 1200, dur: 0.15, vol: 0.3, wave: 'square' });
+            return n;
+        })()
+    },
+    melodia: {
+        name: 'Melodia', duration: 4500,
+        notes: [
+            { time: 0, freq: 523, dur: 0.4, vol: 0.25, wave: 'sine' },
+            { time: 0.5, freq: 587, dur: 0.4, vol: 0.25, wave: 'sine' },
+            { time: 1.0, freq: 659, dur: 0.4, vol: 0.25, wave: 'sine' },
+            { time: 1.5, freq: 698, dur: 0.4, vol: 0.25, wave: 'sine' },
+            { time: 2.0, freq: 784, dur: 0.8, vol: 0.3, wave: 'sine' },
+            { time: 3.0, freq: 784, dur: 0.4, vol: 0.25, wave: 'sine' },
+            { time: 3.5, freq: 698, dur: 0.4, vol: 0.25, wave: 'sine' },
+            { time: 4.0, freq: 659, dur: 0.6, vol: 0.3, wave: 'sine' }
+        ]
+    }
+};
 
-        // ===== Elementos DOM =====
-        const $ = id => document.getElementById(id);
-        const clockHours = $('clockHours'), clockMinutes = $('clockMinutes'), clockSeconds = $('clockSeconds');
-        const clockDate = $('clockDate'), clockRing = $('clockRing');
-        const pickerHoursEl = $('pickerHours'), pickerMinutesEl = $('pickerMinutes');
-        const alarmLabelInput = $('alarmLabel'), voiceSelect = $('voiceSelect'), alarmMessageInput = $('alarmMessage');
-        const btnAdd = $('btnAdd'), alarmsList = $('alarmsList'), alarmCount = $('alarmCount'), emptyState = $('emptyState');
-        const alarmOverlay = $('alarmOverlay'), overlayTime = $('overlayTime'), overlayLabel = $('overlayLabel');
-        const speakingIndicator = $('speakingIndicator'), btnDismiss = $('btnDismiss'), btnSnooze = $('btnSnooze');
-        const toastContainer = $('toastContainer'), btnTestVoice = $('btnTestVoice'), voiceStatus = $('voiceStatus');
-        const notifyCard = $('notifyCard'), notifyClose = $('notifyClose');
-        const notifyTime = $('notifyTime'), notifyLabel = $('notifyLabel'), notifyVoice = $('notifyVoice'), notifyMsg = $('notifyMsg'), notifyProgress = $('notifyProgress');
-        const audioGrid = $('audioGrid'), audioEmptyState = $('audioEmptyState'), audioCount = $('audioCount');
-        const soundTypeSelect = $('soundTypeSelect'), btnRecord = $('btnRecord'), btnRecordAll = $('btnRecordAll');
+/* ========================================
+   ELEMENTOS DOM
+   ======================================== */
+function $(id) { return document.getElementById(id); }
 
-        // ===== Particulas =====
-        (function() {
-            const c = $('particles');
-            for (let i = 0; i < 30; i++) {
-                const p = document.createElement('div');
-                p.classList.add('particle');
-                p.style.left = Math.random() * 100 + '%';
-                p.style.animationDuration = (8 + Math.random() * 12) + 's';
-                p.style.animationDelay = (Math.random() * 10) + 's';
-                p.style.width = p.style.height = (1 + Math.random() * 3) + 'px';
-                c.appendChild(p);
-            }
-        })();
+/* ========================================
+   PARTICULAS DE FUNDO
+   ======================================== */
+(function() {
+    var c = $('particles');
+    for (var i = 0; i < 30; i++) {
+        var p = document.createElement('div');
+        p.classList.add('particle');
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (8 + Math.random() * 12) + 's';
+        p.style.animationDelay = (Math.random() * 10) + 's';
+        var sz = (1 + Math.random() * 3) + 'px';
+        p.style.width = sz;
+        p.style.height = sz;
+        c.appendChild(p);
+    }
+})();
 
-        // ===== Marcas do relogio =====
-        (function() {
-            const c = $('clockMarks');
-            for (let i = 0; i < 60; i++) {
-                const m = document.createElement('div');
-                m.classList.add('clock-mark');
-                if (i % 5 === 0) m.classList.add('major');
-                m.style.transform = `rotate(${i * 6}deg)`;
-                c.appendChild(m);
-            }
-        })();
+/* ========================================
+   MARCAS DO RELOGIO
+   ======================================== */
+(function() {
+    var c = $('clockMarks');
+    for (var i = 0; i < 60; i++) {
+        var m = document.createElement('div');
+        m.classList.add('clock-mark');
+        if (i % 5 === 0) m.classList.add('major');
+        m.style.transform = 'rotate(' + (i * 6) + 'deg)';
+        c.appendChild(m);
+    }
+})();
 
-        // ===== Relogio =====
-        function updateClock() {
-            const now = new Date();
-            clockHours.textContent = String(now.getHours()).padStart(2, '0');
-            clockMinutes.textContent = String(now.getMinutes()).padStart(2, '0');
-            clockSeconds.textContent = String(now.getSeconds()).padStart(2, '0');
-            const pct = ((now.getSeconds() * 1000 + now.getMilliseconds()) / 60000) * 100;
-            clockRing.style.setProperty('--seconds-pct', pct + '%');
-            const dias = ['Domingo','Segunda-feira','Terca-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sabado'];
-            const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-            clockDate.textContent = `${dias[now.getDay()]}, ${now.getDate()} ${meses[now.getMonth()]} ${now.getFullYear()}`;
-            checkAlarms(now);
+/* ========================================
+   RELOGIO EM TEMPO REAL
+   ======================================== */
+function updateClock() {
+    var now = new Date();
+    $('clockHours').textContent = String(now.getHours()).padStart(2, '0');
+    $('clockMinutes').textContent = String(now.getMinutes()).padStart(2, '0');
+    $('clockSeconds').textContent = String(now.getSeconds()).padStart(2, '0');
+    var pct = ((now.getSeconds() * 1000 + now.getMilliseconds()) / 60000) * 100;
+    $('clockRing').style.setProperty('--seconds-pct', pct + '%');
+    var dias = ['Domingo','Segunda','Terca','Quarta','Quinta','Sexta','Sabado'];
+    var meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    $('clockDate').textContent = dias[now.getDay()] + ', ' + now.getDate() + ' ' + meses[now.getMonth()] + ' ' + now.getFullYear();
+    checkAlarms(now);
+}
+setInterval(updateClock, 500);
+updateClock();
+
+/* ========================================
+   SPINNER HORA/MINUTO
+   ======================================== */
+document.querySelectorAll('.spin-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var t = btn.dataset.target;
+        var d = btn.dataset.dir;
+        if (t === 'hours') {
+            pickerHours = d === 'up' ? (pickerHours + 1) % 24 : (pickerHours - 1 + 24) % 24;
+            $('pickerHours').textContent = String(pickerHours).padStart(2, '0');
+        } else {
+            pickerMinutes = d === 'up' ? (pickerMinutes + 1) % 60 : (pickerMinutes - 1 + 60) % 60;
+            $('pickerMinutes').textContent = String(pickerMinutes).padStart(2, '0');
         }
-        setInterval(updateClock, 250);
+    });
+});
+
+/* ========================================
+   MENSAGENS INTELIGENTES DA IA
+   ======================================== */
+function getSmartMessage(h, m) {
+    var t = String(h).padStart(2, '0') + ' horas e ' + String(m).padStart(2, '0') + ' minutos';
+    var map = {
+        madrugada: ['Agora sao ' + t + '. Ta madrugada, mas se precisa acordar agora, levanta!', t + '. Bom dia cedo! O mundo dorme, mas voce ja acordou. Forca!', 'Sao ' + t + ' da madrugada. Acorda! Espero que seja importante.'],
+        manhaCedo: ['Bom dia! Sao ' + t + '. Hora de levantar, tomar cafe e comecar o dia!', 'Acorde! Ja sao ' + t + '. O cafe espera. Levanta, vamos la!', t + '. Bom dia! Nao perca essa manha dormindo.'],
+        manha: ['Sao ' + t + '! Dormiu demais! Levanta logo que o dia ja comecou!', t + '. Bom dia! O sol ja la fora ha um bom tempo. Levanta!'],
+        quaseMeioDia: [t + '. Meu Deus, ainda na cama?! Levanta agora!', 'Sao ' + t + ' da manha! Acorda, faz algo produtivo!'],
+        almoco: [t + '. Hora do almoco! Levanta e vai comer!', 'Meio dia! Sao ' + t + '. Nao fica ai deitado!'],
+        tarde: ['Sao ' + t + ' da tarde. A tarde ta passando, levanta!', t + '. Tarde! Levanta, aproveite o resto do dia.'],
+        fimTarde: [t + ' da tarde. Ja descansou suficiente. Levanta!', 'Sao ' + t + '. Fim de tarde! A noite vai comecar.'],
+        noite: [t + ' da noite. Se precisa fazer algo, agora e a hora!', 'Sao ' + t + '. Boa noite! Espero que seja importante.'],
+        noiteFechada: [t + ' da noite. Assustador acordar assim! Resolve e volta pra cama.', 'Sao ' + t + '. Ta tarde! Vai la, resolve, e dorme.']
+    };
+    var key;
+    if (h >= 4 && h < 6) key = 'madrugada';
+    else if (h >= 6 && h < 8) key = 'manhaCedo';
+    else if (h >= 8 && h < 10) key = 'manha';
+    else if (h >= 10 && h < 12) key = 'quaseMeioDia';
+    else if (h >= 12 && h < 14) key = 'almoco';
+    else if (h >= 14 && h < 17) key = 'tarde';
+    else if (h >= 17 && h < 20) key = 'fimTarde';
+    else if (h >= 20 && h < 22) key = 'noite';
+    else key = 'noiteFechada';
+    var arr = map[key];
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+function escapeHTML(str) {
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+}
+
+function showToast(message, type) {
+    type = type || 'success';
+    var t = document.createElement('div');
+    t.classList.add('toast', type);
+    var icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    t.innerHTML = '<i class="fas ' + (icons[type] || icons.success) + '"></i> ' + escapeHTML(message);
+    $('toastContainer').appendChild(t);
+    setTimeout(function() {
+        t.style.animation = 'toastOut 0.3s ease-in forwards';
+        setTimeout(function() { if (t.parentNode) t.remove(); }, 300);
+    }, 3000);
+}
+
+/* ========================================
+   IndexedDB - BANCO DE DADOS
+   ======================================== */
+function openDB() {
+    return new Promise(function(resolve) {
+        try {
+            var req = indexedDB.open('VoiceAlarmDB', 2);
+            req.onupgradeneeded = function(e) {
+                var d = e.target.result;
+                if (!d.objectStoreNames.contains('alarms')) d.createObjectStore('alarms', { keyPath: 'id' });
+                if (!d.objectStoreNames.contains('audios')) d.createObjectStore('audios', { keyPath: 'id' });
+            };
+            req.onsuccess = function(e) { db = e.target.result; resolve(true); };
+            req.onerror = function() { resolve(false); };
+        } catch (e) { resolve(false); }
+    });
+}
+
+function dbPut(store, data) {
+    return new Promise(function(resolve) {
+        if (!db) { resolve(false); return; }
+        try {
+            var tx = db.transaction(store, 'readwrite');
+            tx.objectStore(store).put(data);
+            tx.oncomplete = function() { resolve(true); };
+            tx.onerror = function() { resolve(false); };
+        } catch (e) { resolve(false); }
+    });
+}
+
+function dbGetAll(store) {
+    return new Promise(function(resolve) {
+        if (!db) { resolve([]); return; }
+        try {
+            var tx = db.transaction(store, 'readonly');
+            var req = tx.objectStore(store).getAll();
+            req.onsuccess = function() { resolve(req.result || []); };
+            req.onerror = function() { resolve([]); };
+        } catch (e) { resolve([]); }
+    });
+}
+
+function dbDelete(store, id) {
+    return new Promise(function(resolve) {
+        if (!db) { resolve(false); return; }
+        try {
+            var tx = db.transaction(store, 'readwrite');
+            tx.objectStore(store).delete(id);
+            tx.oncomplete = function() { resolve(true); };
+            tx.onerror = function() { resolve(false); };
+        } catch (e) { resolve(false); }
+    });
+}
+
+/* ========================================
+   CARREGAR DADOS SALVOS
+   ======================================== */
+async function loadSavedData() {
+    var ok = await openDB();
+    if (!ok) {
+        showToast('Banco de dados indisponivel', 'error');
+        return;
+    }
+    var sa = await dbGetAll('alarms');
+    if (sa.length > 0) {
+        alarms = sa;
+        alarmIdCounter = 0;
+        alarms.forEach(function(a) { if (a.id > alarmIdCounter) alarmIdCounter = a.id; a.triggered = false; });
+        renderAlarms();
+    }
+    var aa = await dbGetAll('audios');
+    if (aa.length > 0) {
+        savedAudios = aa;
+        audioIdCounter = 0;
+        savedAudios.forEach(function(a) { if (a.id > audioIdCounter) audioIdCounter = a.id; });
+        renderAudioBank();
+    }
+}
+
+/* ========================================
+   CARREGAMENTO DE VOZES COM PRIORIZACAO
+   ======================================== */
+// Palavras-chave para detectar vozes femininas
+var FEMALE_KEYWORDS = [
+    'female', 'woman', 'mulher', 'feminina',
+    'zira', 'hazel', 'susan', 'karen', 'samantha', 'victoria',
+    'fiona', 'moira', 'tessa', 'veena', 'alice', 'anna',
+    'helena', 'paulina', 'monica', 'luciana', 'isabel',
+    'maria', 'joana', 'cate', 'amalia', 'elena', 'sofia',
+    'claudia', 'raquel', 'beatriz', 'ines', 'ines',
+    'google.*female', 'microsoft.*female'
+];
+
+function isFemaleVoice(voice) {
+    var name = voice.name.toLowerCase();
+    for (var i = 0; i < FEMALE_KEYWORDS.length; i++) {
+        if (name.indexOf(FEMALE_KEYWORDS[i]) !== -1) return true;
+    }
+    return false;
+}
+
+function loadVoices() {
+    var allVoices = speechSynthesis.getVoices();
+    if (allVoices.length === 0) return false;
+
+    voicesLoaded = true;
+    var sel = $('voiceSelect');
+    sel.innerHTML = '';
+
+    // Prioridade: portugues feminino > qualquer feminino > portugues > todas
+    var ptVoices = allVoices.filter(function(v) { return v.lang.indexOf('pt') === 0; });
+    var ptFemale = ptVoices.filter(isFemaleVoice);
+    var allFemale = allVoices.filter(isFemaleVoice);
+
+    var prioritized;
+    if (ptFemale.length > 0) prioritized = ptFemale;
+    else if (allFemale.length > 0) prioritized = allFemale;
+    else if (ptVoices.length > 0) prioritized = ptVoices;
+    else prioritized = allVoices;
+
+    var seen = {};
+    prioritized.forEach(function(v) {
+        var key = v.name + '|' + v.lang;
+        if (seen[key]) return;
+        seen[key] = true;
+
+        var opt = document.createElement('option');
+        opt.value = v.name;
+        var female = isFemaleVoice(v);
+        opt.textContent = v.name + (female ? ' \u2640' : '') + ' (' + v.lang + ')';
+        sel.appendChild(opt);
+    });
+
+    // Selecionar primeira voz
+    if (prioritized.length > 0) {
+        selectedVoice = allVoices.find(function(v) { return v.name === prioritized[0].name; }) || null;
+    }
+
+    updateVoiceStatus('ready', prioritized.length + ' voz(es) disponivel(is)');
+    return true;
+}
+
+function updateVoiceStatus(state, text) {
+    var el = $('voiceStatus');
+    el.className = 'voice-status ' + state;
+    el.innerHTML = '<span class="dot"></span><span>' + text + '</span>';
+}
+
+// Multiplos tentativas de carregamento (vozes carregam async em muitos navegadores)
+speechSynthesis.onvoiceschanged = function() { if (!voicesLoaded) loadVoices(); };
+setTimeout(function() { if (!voicesLoaded) loadVoices(); }, 100);
+setTimeout(function() { if (!voicesLoaded) loadVoices(); }, 500);
+setTimeout(function() { if (!voicesLoaded) loadVoices(); }, 1000);
+setTimeout(function() { if (!voicesLoaded) loadVoices(); }, 2000);
+setTimeout(function() {
+    if (!voicesLoaded) {
+        updateVoiceStatus('error', 'Nenhuma voz encontrada. Verifique o navegador.');
+        $('voiceSelect').innerHTML = '<option>Voz padrao do sistema</option>';
+    }
+}, 4000);
+
+ $('voiceSelect').addEventListener('change', function() {
+    var allV = speechSynthesis.getVoices();
+    selectedVoice = allV.find(function(v) { return v.name === $('voiceSelect').value; }) || null;
+});
+
+/* ========================================
+   TESTAR VOZ (PITCH 1.15 + RATE 0.92)
+   ======================================== */
+ $('btnTestVoice').addEventListener('click', function() {
+    if (!voicesLoaded) { showToast('Aguarde as vozes carregarem', 'error'); return; }
+
+    speechSynthesis.cancel();
+
+    var msg = getSmartMessage(pickerHours, pickerMinutes);
+    var u = new SpeechSynthesisUtterance(msg);
+    u.rate = 0.92;   // Levemente mais lento para naturalidade
+    u.pitch = 1.15;  // Tom mais alto para soar feminino
+    u.volume = 1;
+    if (selectedVoice) u.voice = selectedVoice;
+
+    var btn = $('btnTestVoice');
+    btn.classList.add('playing');
+    btn.innerHTML = '<i class="fas fa-volume-up"></i> Falando...';
+
+    u.onend = function() {
+        btn.classList.remove('playing');
+        btn.innerHTML = '<i class="fas fa-play"></i> Ouvir';
+    };
+    u.onerror = function() {
+        btn.classList.remove('playing');
+        btn.innerHTML = '<i class="fas fa-play"></i> Ouvir';
+    };
+
+    speechSynthesis.speak(u);
+});
+
+/* ========================================
+   AUDIOCONTEXT - INICIALIZAR NO PRIMEIRO CLIQUE
+   ======================================== */
+function ensureAudioCtx() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+// Desbloquear synthesis e AudioContext no primeiro clique
+document.addEventListener('click', function unlock() {
+    ensureAudioCtx();
+    // Warm up speech synthesis (necessario no Chrome)
+    try {
+        var warmup = new SpeechSynthesisUtterance('');
+        warmup.volume = 0;
+        speechSynthesis.speak(warmup);
+    } catch(e) {}
+    document.removeEventListener('click', unlock);
+}, { once: true });
+
+/* ========================================
+   NOTIFICACAO AO ADICIONAR ALARME
+   ======================================== */
+function showAlarmNotify(alarm) {
+    $('notifyTime').textContent = String(alarm.hours).padStart(2, '0') + ':' + String(alarm.minutes).padStart(2, '0');
+    $('notifyLabel').textContent = alarm.label;
+    var vn = alarm.voiceName ? alarm.voiceName.split(' ').slice(0, 3).join(' ') : 'Padrao';
+    $('notifyVoice').innerHTML = '<i class="fas fa-microphone"></i> ' + escapeHTML(vn);
+    $('notifyMsg').textContent = alarm.message;
+
+    // Reiniciar animacao
+    var bar = $('notifyProgress');
+    bar.style.animation = 'none';
+    bar.offsetHeight;
+    bar.style.animation = 'notifyProgress 5s linear forwards';
+
+    $('notifyCard').classList.add('show');
+    if (notifyTimer) clearTimeout(notifyTimer);
+    notifyTimer = setTimeout(function() { $('notifyCard').classList.remove('show'); }, 5200);
+
+    // Notificacao nativa do navegador
+    if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+            new Notification('Alarme Adicionado', {
+                body: alarm.label + ' - ' + String(alarm.hours).padStart(2, '0') + ':' + String(alarm.minutes).padStart(2, '0')
+            });
+        } catch(e) {}
+    }
+}
+
+ $('notifyClose').addEventListener('click', function() {
+    $('notifyCard').classList.remove('show');
+    if (notifyTimer) clearTimeout(notifyTimer);
+});
+
+/* ========================================
+   ADICIONAR ALARME
+   ======================================== */
+ $('btnAdd').addEventListener('click', async function() {
+    ensureAudioCtx();
+
+    // Solicitar permissao de notificacao
+    if ('Notification' in window && Notification.permission === 'default') {
+        try { await Notification.requestPermission(); } catch(e) {}
+    }
+
+    var h = pickerHours;
+    var m = pickerMinutes;
+    var label = $('alarmLabel').value.trim() || 'Alarme';
+    var voiceName = $('voiceSelect').value || '';
+    var customMsg = $('alarmMessage').value.trim();
+    var message = customMsg || getSmartMessage(h, m);
+
+    var alarm = {
+        id: ++alarmIdCounter,
+        hours: h,
+        minutes: m,
+        label: label,
+        voiceName: voiceName,
+        message: message,
+        enabled: true,
+        triggered: false
+    };
+
+    alarms.push(alarm);
+    await dbPut('alarms', alarm);
+    renderAlarms();
+    showAlarmNotify(alarm);
+
+    $('alarmLabel').value = '';
+    $('alarmMessage').value = '';
+});
+
+/* ========================================
+   RENDERIZAR LISTA DE ALARMES
+   ======================================== */
+function renderAlarms() {
+    $('alarmCount').textContent = alarms.length;
+    var list = $('alarmsList');
+
+    if (alarms.length === 0) {
+        list.innerHTML = '';
+        var es = document.createElement('div');
+        es.classList.add('empty-state');
+        es.id = 'emptyState';
+        es.innerHTML = '<i class="fas fa-bell-slash"></i><p>Nenhum alarme configurado</p>';
+        list.appendChild(es);
+        return;
+    }
+
+    list.innerHTML = '';
+    alarms.forEach(function(alarm) {
+        var card = document.createElement('div');
+        card.classList.add('alarm-card');
+        if (alarm.enabled) card.classList.add('active');
+        if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) card.classList.add('ringing');
+
+        card.innerHTML =
+            '<div class="alarm-time-display">' + String(alarm.hours).padStart(2, '0') + ':' + String(alarm.minutes).padStart(2, '0') + '</div>' +
+            '<div class="alarm-info">' +
+                '<div class="alarm-label-text">' + escapeHTML(alarm.label) + '</div>' +
+                '<div class="alarm-msg-preview">' + escapeHTML(alarm.message) + '</div>' +
+                '<span class="alarm-voice-badge"><i class="fas fa-microphone"></i> Voz IA</span>' +
+            '</div>' +
+            '<div class="alarm-actions">' +
+                '<div class="toggle ' + (alarm.enabled ? 'on' : '') + '" data-id="' + alarm.id + '" tabindex="0" role="switch" aria-checked="' + alarm.enabled + '"></div>' +
+                '<button class="btn-delete" data-id="' + alarm.id + '"><i class="fas fa-trash"></i></button>' +
+            '</div>';
+
+        list.appendChild(card);
+    });
+
+    // Toggle eventos
+    list.querySelectorAll('.toggle').forEach(function(toggle) {
+        function handler() {
+            var id = parseInt(toggle.dataset.id);
+            var alarm = alarms.find(function(a) { return a.id === id; });
+            if (alarm) {
+                alarm.enabled = !alarm.enabled;
+                alarm.triggered = false;
+                dbPut('alarms', alarm);
+                renderAlarms();
+            }
+        }
+        toggle.addEventListener('click', handler);
+        toggle.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
+        });
+    });
+
+    // Delete eventos
+    list.querySelectorAll('.btn-delete').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = parseInt(btn.dataset.id);
+            alarms = alarms.filter(function(a) { return a.id !== id; });
+            dbDelete('alarms', id);
+            renderAlarms();
+            showToast('Alarme removido', 'error');
+        });
+    });
+}
+
+/* ========================================
+   VERIFICAR E DISPARAR ALARMES
+   ======================================== */
+function checkAlarms(now) {
+    // Nao verificar nos primeiros 3 segundos apos carregar a pagina
+    if (Date.now() - appStartTime < 3000) return;
+
+    var h = now.getHours();
+    var m = now.getMinutes();
+    var s = now.getSeconds();
+    var minuteKey = h * 60 + m;
+
+    // So verificar nos primeiros 5 segundos de cada minuto
+    if (s > 5) return;
+
+    // Evitar duplicar no mesmo minuto
+    if (minuteKey === lastTriggeredMinute) return;
+
+    alarms.forEach(function(alarm) {
+        if (!alarm.enabled || alarm.triggered) return;
+        if (alarm.hours === h && alarm.minutes === m) {
+            alarm.triggered = true;
+            lastTriggeredMinute = minuteKey;
+            triggerAlarm(alarm);
+        }
+    });
+}
+
+// Verificar imediatamente quando a aba voltar a ficar visivel
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
         updateClock();
+    }
+});
 
-        // ===== Spinner =====
-        document.querySelectorAll('.spin-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const t = btn.dataset.target, d = btn.dataset.dir;
-                if (t === 'hours') {
-                    pickerHours = d === 'up' ? (pickerHours + 1) % 24 : (pickerHours - 1 + 24) % 24;
-                    pickerHoursEl.textContent = String(pickerHours).padStart(2, '0');
-                } else {
-                    pickerMinutes = d === 'up' ? (pickerMinutes + 1) % 60 : (pickerMinutes - 1 + 60) % 60;
-                    pickerMinutesEl.textContent = String(pickerMinutes).padStart(2, '0');
-                }
-            });
-        });
+/* ========================================
+   DISPARAR ALARME
+   ======================================== */
+function triggerAlarm(alarm) {
+    currentRingingAlarm = alarm;
+    renderAlarms();
 
-        // ===== Mensagens IA =====
-        function getSmartMessage(h, m) {
-            const t = `${String(h).padStart(2,'0')} horas e ${String(m).padStart(2,'0')} minutos`;
-            const msgs = {
-                madrugada: [`Agora sao ${t}. Ta madrugada, mas se precisa acordar agora, levanta!`,`${t}. Bom dia cedo! O mundo dorme, mas voce ja acordou. Forca!`,`Sao ${t} da madrugada. Acorda! Espero que seja importante.`],
-                manhaCedo: [`Bom dia! Sao ${t}. Hora de levantar, tomar cafe e comecar o dia!`,`Acorde! Ja sao ${t}. O cafe espera. Levanta, vamos la!`,`${t}. Bom dia! Nao perca essa manha dormindo.`],
-                manha: [`Sao ${t}! Dormiu demais! Levanta logo!`,`${t}. Bom dia! O sol ja la fora. Levanta da cama!`],
-                quaseMeioDia: [`${t}. Meu Deus, ainda na cama?! Levanta agora!`,`Sao ${t} da manha! Acorda, faz algo produtivo!`],
-                almoco: [`${t}. Almoco! Levanta e vai comer!`,`Meio dia! Sao ${t}. Hora do almoco.`],
-                tarde: [`Sao ${t} da tarde. A tarde ta passando!`,`${t}. Tarde! Levanta, aproveite o dia.`],
-                fimTarde: [`${t} da tarde. Ja descansou suficiente. Levanta!`,`Sao ${t}. Fim de tarde! A noite vai comecar.`],
-                noite: [`${t} da noite. Se precisa fazer algo, agora!`,`Sao ${t}. Boa noite! Espero que seja importante.`],
-                noiteFechada: [`${t} da noite. Assustador acordar assim! Vai la!`,`Sao ${t}. Ta tarde! Resolve e volta pra cama.`]
-            };
-            let key;
-            if (h >= 4 && h < 6) key = 'madrugada';
-            else if (h >= 6 && h < 8) key = 'manhaCedo';
-            else if (h >= 8 && h < 10) key = 'manha';
-            else if (h >= 10 && h < 12) key = 'quaseMeioDia';
-            else if (h >= 12 && h < 14) key = 'almoco';
-            else if (h >= 14 && h < 17) key = 'tarde';
-            else if (h >= 17 && h < 20) key = 'fimTarde';
-            else if (h >= 20 && h < 22) key = 'noite';
-            else key = 'noiteFechada';
-            const arr = msgs[key];
-            return arr[Math.floor(Math.random() * arr.length)];
+    $('overlayTime').textContent = String(alarm.hours).padStart(2, '0') + ':' + String(alarm.minutes).padStart(2, '0');
+    $('overlayLabel').textContent = alarm.label;
+    $('alarmOverlay').classList.add('show');
+
+    ensureAudioCtx();
+    startBeep();
+
+    // Salvar audio automaticamente no banco
+    autoSaveAudio(alarm);
+
+    // Falar depois de 800ms
+    setTimeout(function() {
+        if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) {
+            speakAlarmLoop(alarm);
         }
+    }, 800);
+}
 
-        // ===== IndexedDB =====
-        const DB_NAME = 'VoiceAlarmDB';
-        const DB_VERSION = 1;
-        let db = null;
+/* ========================================
+   SINTSESE DE VOZ - LOOP ROBUSTO
+   Pitch 1.15 + Rate 0.92 para tom feminino natural
+   ======================================== */
+function speakAlarmLoop(alarm) {
+    if (!currentRingingAlarm || currentRingingAlarm.id !== alarm.id) return;
 
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                try {
-                    const req = indexedDB.open(DB_NAME, DB_VERSION);
-                    req.onupgradeneeded = e => {
-                        const d = e.target.result;
-                        if (!d.objectStoreNames.contains('alarms')) d.createObjectStore('alarms', { keyPath: 'id' });
-                        if (!d.objectStoreNames.contains('audios')) d.createObjectStore('audios', { keyPath: 'id' });
-                    };
-                    req.onsuccess = e => { db = e.target.result; resolve(db); };
-                    req.onerror = e => { console.warn('IndexedDB indisponivel, usando memoria'); resolve(null); };
-                } catch { resolve(null); }
-            });
+    speechSynthesis.cancel();
+
+    var u = new SpeechSynthesisUtterance(alarm.message);
+    u.rate = 0.92;   // Mais lento = mais natural
+    u.pitch = 1.15;  // Tom mais alto = feminino
+    u.volume = 1;
+
+    // Buscar voz salva no alarme
+    var allV = speechSynthesis.getVoices();
+    if (alarm.voiceName) {
+        var found = allV.find(function(v) { return v.name === alarm.voiceName; });
+        if (found) u.voice = found;
+    } else if (selectedVoice) {
+        u.voice = selectedVoice;
+    }
+
+    $('speakingIndicator').style.display = 'flex';
+
+    u.onend = function() {
+        $('speakingIndicator').style.display = 'none';
+        if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) {
+            speakLoopTimer = setTimeout(function() { speakAlarmLoop(alarm); }, 4000);
         }
+    };
 
-        async function dbPut(store, data) {
-            if (!db) return;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(store, 'readwrite');
-                tx.objectStore(store).put(data);
-                tx.oncomplete = resolve;
-                tx.onerror = reject;
-            });
+    u.onerror = function() {
+        $('speakingIndicator').style.display = 'none';
+        if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) {
+            speakLoopTimer = setTimeout(function() { speakAlarmLoop(alarm); }, 3000);
         }
+    };
 
-        async function dbGetAll(store) {
-            if (!db) return [];
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(store, 'readonly');
-                const req = tx.objectStore(store).getAll();
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = reject;
-            });
-        }
+    speechSynthesis.speak(u);
 
-        async function dbDelete(store, id) {
-            if (!db) return;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(store, 'readwrite');
-                tx.objectStore(store).delete(id);
-                tx.oncomplete = resolve;
-                tx.onerror = reject;
-            });
-        }
-
-        async function dbGet(store, id) {
-            if (!db) return null;
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction(store, 'readonly');
-                const req = tx.objectStore(store).get(id);
-                req.onsuccess = () => resolve(req.result || null);
-                req.onerror = reject;
-            });
-        }
-
-        // ===== Carregar dados salvos =====
-        async function loadSavedData() {
-            await openDB();
-            const savedAlarms = await dbGetAll('alarms');
-            if (savedAlarms.length > 0) {
-                alarms = savedAlarms;
-                alarmIdCounter = Math.max(...alarms.map(a => a.id), 0);
-                alarms.forEach(a => { a.triggered = false; });
-                renderAlarms();
-            }
-            const savedAuds = await dbGetAll('audios');
-            if (savedAuds.length > 0) {
-                savedAudios = savedAuds;
-                audioIdCounter = Math.max(...savedAudios.map(a => a.id), 0);
-                renderAudioBank();
-            }
-        }
-
-        // ===== Vozes =====
-        function loadVoices() {
-            const allVoices = speechSynthesis.getVoices();
-            if (allVoices.length === 0) return false;
-            voicesLoaded = true;
-            voiceSelect.innerHTML = '';
-            const fk = ['female','woman','mulher','feminina','zira','hazel','susan','karen','samantha','victoria','fiona','moira','tessa','veena','alice','anna','helena','paulina','monica','luciana','isabel','maria','joana','cate','amalia','elena','sofia'];
-            const ptV = allVoices.filter(v => v.lang.startsWith('pt'));
-            const ptF = ptV.filter(v => fk.some(k => v.name.toLowerCase().includes(k)));
-            const allF = allVoices.filter(v => fk.some(k => v.name.toLowerCase().includes(k)));
-            let pri = ptF.length > 0 ? ptF : allF.length > 0 ? allF : ptV.length > 0 ? ptV : allVoices;
-            const seen = new Set();
-            pri.forEach(v => {
-                const key = v.name + v.lang;
-                if (seen.has(key)) return;
-                seen.add(key);
-                const opt = document.createElement('option');
-                opt.value = v.name;
-                const isF = fk.some(k => v.name.toLowerCase().includes(k));
-                opt.textContent = `${v.name}${isF ? ' ♀' : ''} (${v.lang})`;
-                voiceSelect.appendChild(opt);
-            });
-            if (pri.length > 0) selectedVoice = allVoices.find(v => v.name === pri[0].name) || null;
-            updateVoiceStatus('ready', `${pri.length} voz(es) disponivel(is)`);
-            return true;
-        }
-        function updateVoiceStatus(state, text) {
-            voiceStatus.className = 'voice-status ' + state;
-            voiceStatus.innerHTML = `<span class="dot"></span><span>${text}</span>`;
-        }
-        speechSynthesis.onvoiceschanged = () => { if (!voicesLoaded) loadVoices(); };
-        setTimeout(() => { if (!voicesLoaded) loadVoices(); }, 500);
-        setTimeout(() => { if (!voicesLoaded) loadVoices(); }, 1500);
-        setTimeout(() => { if (!voicesLoaded) { updateVoiceStatus('error','Nenhuma voz encontrada.'); voiceSelect.innerHTML = '<option>Voz padrao</option>'; } }, 3000);
-        voiceSelect.addEventListener('change', () => {
-            selectedVoice = speechSynthesis.getVoices().find(v => v.name === voiceSelect.value) || null;
-        });
-
-        // ===== Testar voz =====
-        btnTestVoice.addEventListener('click', () => {
-            if (!voicesLoaded) { showToast('Aguarde as vozes carregarem', 'error'); return; }
+    // WORKAROUND CRUCIAL: Chrome para a sintese apos ~15s
+    // Solucao: cancelar e re-falar antes do timeout
+    var chromeFix = setTimeout(function() {
+        if (currentRingingAlarm && currentRingingAlarm.id === alarm.id && speechSynthesis.speaking) {
             speechSynthesis.cancel();
-            const msg = getSmartMessage(pickerHours, pickerMinutes);
-            const u = new SpeechSynthesisUtterance(msg);
-            u.rate = 0.92; u.pitch = 1.15; u.volume = 1;
-            if (selectedVoice) u.voice = selectedVoice;
-            btnTestVoice.classList.add('playing');
-            btnTestVoice.innerHTML = '<i class="fas fa-volume-up"></i> Falando...';
-            u.onend = () => { btnTestVoice.classList.remove('playing'); btnTestVoice.innerHTML = '<i class="fas fa-play"></i> Ouvir'; };
-            u.onerror = () => { btnTestVoice.classList.remove('playing'); btnTestVoice.innerHTML = '<i class="fas fa-play"></i> Ouvir'; showToast('Erro ao falar', 'error'); };
-            speechSynthesis.speak(u);
-        });
-
-        // ===== AudioContext =====
-        function ensureAudioCtx() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            // onend sera chamado, que agendara o proximo ciclo
         }
-        document.addEventListener('click', ensureAudioCtx, { once: true });
-        document.addEventListener('touchstart', ensureAudioCtx, { once: true });
+    }, 13000);
 
-        // ===== Notificacao de alarme adicionado =====
-        function showAlarmNotify(alarm) {
-            notifyTime.textContent = `${String(alarm.hours).padStart(2,'0')}:${String(alarm.minutes).padStart(2,'0')}`;
-            notifyLabel.textContent = alarm.label;
-            const voiceName = alarm.voiceName ? alarm.voiceName.split(' ').slice(0, 2).join(' ') : 'Padrao';
-            notifyVoice.innerHTML = `<i class="fas fa-microphone"></i> ${escapeHTML(voiceName)}`;
-            notifyMsg.textContent = alarm.message;
-            // Reiniciar animacao da barra de progresso
-            notifyProgress.style.animation = 'none';
-            notifyProgress.offsetHeight; // reflow
-            notifyProgress.style.animation = 'notifyProgress 5s linear forwards';
-            notifyCard.classList.add('show');
-            if (notifyTimer) clearTimeout(notifyTimer);
-            notifyTimer = setTimeout(() => notifyCard.classList.remove('show'), 5000);
-            // Notificacao do navegador
-            if ('Notification' in window && Notification.permission === 'granted') {
-                try { new Notification('Alarme Adicionado', { body: `${alarm.label} - ${String(alarm.hours).padStart(2,'0')}:${String(alarm.minutes).padStart(2,'0')}`, icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">🔔</text></svg>' }); } catch {}
-            }
-        }
-        notifyClose.addEventListener('click', () => { notifyCard.classList.remove('show'); if (notifyTimer) clearTimeout(notifyTimer); });
+    // Limpar o fix se o alarme for desativado
+    var origOnEnd = u.onend;
+    u.onend = function() {
+        clearTimeout(chromeFix);
+        origOnEnd();
+    };
+    var origOnError = u.onerror;
+    u.onerror = function() {
+        clearTimeout(chromeFix);
+        origOnError();
+    };
+}
 
-        // ===== Solicitar permissao de notificacao =====
-        function requestNotifPermission() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                Notification.requestPermission();
-            }
-        }
+/* ========================================
+   SOM DE BEEP (Web Audio API)
+   ======================================== */
+function startBeep() {
+    stopBeep();
+    if (!audioCtx) return;
 
-        // ===== Gravar som =====
-        async function recordSound(typeKey) {
-            if (!window.MediaRecorder) { showToast('Navegador nao suporta gravacao de audio', 'error'); return null; }
-            ensureAudioCtx();
-            const recCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const dest = recCtx.createMediaStreamDestination();
-            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
-                : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
-                : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
-            if (!mimeType) { showToast('Nenhum formato de audio suportado', 'error'); recCtx.close(); return null; }
-            const recorder = new MediaRecorder(dest.stream, { mimeType });
-            const chunks = [];
-            const config = SOUND_TYPES[typeKey];
-            return new Promise((resolve) => {
-                recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-                recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: mimeType });
-                    recCtx.close().catch(() => {});
-                    resolve(blob);
-                };
-                recorder.onerror = () => { recCtx.close().catch(() => {}); resolve(null); };
-                recorder.start(100);
-                // Gerar padrao sonoro conectado ao destino de gravacao e alto-falante
-                config.notes.forEach(note => {
+    function cycle() {
+        if (!currentRingingAlarm) return;
+
+        for (var i = 0; i < 3; i++) {
+            (function(idx) {
+                var t = setTimeout(function() {
+                    if (!currentRingingAlarm) return;
                     try {
-                        const osc = recCtx.createOscillator();
-                        const gain = recCtx.createGain();
-                        osc.type = note.wave || 'sine';
-                        osc.frequency.setValueAtTime(note.freq, recCtx.currentTime + note.time);
-                        gain.gain.setValueAtTime(0, recCtx.currentTime + note.time);
-                        gain.gain.linearRampToValueAtTime(note.vol || 0.3, recCtx.currentTime + note.time + 0.02);
-                        gain.gain.exponentialRampToValueAtTime(0.001, recCtx.currentTime + note.time + note.dur);
+                        var osc = audioCtx.createOscillator();
+                        var gain = audioCtx.createGain();
                         osc.connect(gain);
-                        gain.connect(recCtx.destination); // alto-falante
-                        gain.connect(dest); // gravador
-                        osc.start(recCtx.currentTime + note.time);
-                        osc.stop(recCtx.currentTime + note.time + note.dur + 0.05);
-                    } catch {}
-                });
-                setTimeout(() => { if (recorder.state === 'recording') recorder.stop(); }, config.duration + 300);
-            });
+                        gain.connect(audioCtx.destination);
+                        osc.type = 'sine';
+                        var now = audioCtx.currentTime;
+                        osc.frequency.setValueAtTime(880, now);
+                        osc.frequency.setValueAtTime(1100, now + 0.08);
+                        gain.gain.setValueAtTime(0.25, now);
+                        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+                        osc.start(now);
+                        osc.stop(now + 0.25);
+                    } catch(e) {}
+                }, idx * 380);
+                beepTimeouts.push(t);
+            })(i);
         }
 
-        async function saveRecordedAudio(typeKey, blob) {
-            if (!blob) return;
-            const config = SOUND_TYPES[typeKey];
-            const ext = blob.type.includes('mp4') ? 'mp4' : 'webm';
-            const audioEntry = {
-                id: ++audioIdCounter,
-                name: `Alarme ${config.name}`,
-                type: typeKey,
-                typeName: config.name,
-                blob: blob,
-                mimeType: blob.type,
-                ext: ext,
-                duration: config.duration,
-                size: blob.size,
-                createdAt: new Date().toISOString()
+        var nextCycle = setTimeout(function() { cycle(); }, 1800);
+        beepTimeouts.push(nextCycle);
+    }
+
+    cycle();
+}
+
+function stopBeep() {
+    for (var i = 0; i < beepTimeouts.length; i++) clearTimeout(beepTimeouts[i]);
+    beepTimeouts = [];
+    if (speakLoopTimer) { clearTimeout(speakLoopTimer); speakLoopTimer = null; }
+}
+
+/* ========================================
+   DESATIVAR ALARME
+   ======================================== */
+function dismissAlarm() {
+    speechSynthesis.cancel();
+    stopBeep();
+    if (currentRingingAlarm) {
+        currentRingingAlarm.triggered = false;
+        currentRingingAlarm = null;
+    }
+    $('alarmOverlay').classList.remove('show');
+    $('speakingIndicator').style.display = 'none';
+    lastTriggeredMinute = -1;
+    renderAlarms();
+    showToast('Alarme desativado', 'success');
+}
+
+ $('btnDismiss').addEventListener('click', dismissAlarm);
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && currentRingingAlarm) dismissAlarm();
+});
+
+/* ========================================
+   ADIAR ALARME (SNOOZE 5 MIN)
+   ======================================== */
+ $('btnSnooze').addEventListener('click', async function() {
+    speechSynthesis.cancel();
+    stopBeep();
+
+    if (!currentRingingAlarm) return;
+
+    var nm = currentRingingAlarm.minutes + 5;
+    var nh = currentRingingAlarm.hours;
+    if (nm >= 60) { nm -= 60; nh = (nh + 1) % 24; }
+
+    currentRingingAlarm.hours = nh;
+    currentRingingAlarm.minutes = nm;
+    currentRingingAlarm.message = getSmartMessage(nh, nm);
+    currentRingingAlarm.triggered = false;
+    currentRingingAlarm.enabled = true;
+
+    await dbPut('alarms', currentRingingAlarm);
+
+    var label = currentRingingAlarm.label;
+    currentRingingAlarm = null;
+
+    $('alarmOverlay').classList.remove('show');
+    $('speakingIndicator').style.display = 'none';
+    lastTriggeredMinute = -1;
+    renderAlarms();
+    showToast('"' + label + '" adiado para ' + String(nh).padStart(2, '0') + ':' + String(nm).padStart(2, '0'), 'info');
+});
+
+/* ========================================
+   GRAVAR SOM COM MediaRecorder
+   ======================================== */
+function recordSound(typeKey) {
+    return new Promise(function(resolve) {
+        if (!window.MediaRecorder) {
+            showToast('Navegador nao suporta gravacao', 'error');
+            resolve(null);
+            return;
+        }
+
+        ensureAudioCtx();
+
+        try {
+            var recCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var dest = recCtx.createMediaStreamDestination();
+
+            // Escolher melhor mimeType
+            var mimeType = '';
+            var types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+            for (var i = 0; i < types.length; i++) {
+                if (MediaRecorder.isTypeSupported(types[i])) { mimeType = types[i]; break; }
+            }
+            if (!mimeType) {
+                showToast('Nenhum formato de audio suportado', 'error');
+                recCtx.close();
+                resolve(null);
+                return;
+            }
+
+            var recorder = new MediaRecorder(dest.stream, { mimeType: mimeType });
+            var chunks = [];
+
+            recorder.ondataavailable = function(e) {
+                if (e.data && e.data.size > 0) chunks.push(e.data);
             };
-            savedAudios.push(audioEntry);
-            // Salvar no IndexedDB
-            await dbPut('audios', { ...audioEntry, blob: blob });
+
+            recorder.onstop = function() {
+                if (chunks.length === 0) { recCtx.close(); resolve(null); return; }
+                var blob = new Blob(chunks, { type: mimeType });
+                recCtx.close().catch(function() {});
+                resolve(blob);
+            };
+
+            recorder.onerror = function() {
+                recCtx.close().catch(function() {});
+                resolve(null);
+            };
+
+            recorder.start(100);
+
+            // Gerar som conectado ao destino de gravacao E ao alto-falante
+            var config = SOUND_TYPES[typeKey];
+            config.notes.forEach(function(note) {
+                try {
+                    var osc = recCtx.createOscillator();
+                    var gain = recCtx.createGain();
+                    osc.type = note.wave || 'sine';
+                    var t = recCtx.currentTime + note.time;
+                    osc.frequency.setValueAtTime(note.freq, t);
+                    gain.gain.setValueAtTime(0, t);
+                    gain.gain.linearRampToValueAtTime(note.vol || 0.3, t + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + note.dur);
+                    osc.connect(gain);
+                    gain.connect(recCtx.destination); // alto-falante
+                    gain.connect(dest);               // gravador
+                    osc.start(t);
+                    osc.stop(t + note.dur + 0.05);
+                } catch(e) {}
+            });
+
+            // Parar gravacao apos duracao + margem
+            setTimeout(function() {
+                try { if (recorder.state === 'recording') recorder.stop(); } catch(e) {}
+            }, config.duration + 500);
+
+        } catch(e) {
+            resolve(null);
+        }
+    });
+}
+
+/* ========================================
+   SALVAR AUDIO GRAVADO NO BANCO
+   ======================================== */
+async function saveRecordedAudio(typeKey, blob) {
+    if (!blob) return;
+    var config = SOUND_TYPES[typeKey];
+    var ext = blob.type.indexOf('mp4') !== -1 ? 'mp4' : blob.type.indexOf('ogg') !== -1 ? 'ogg' : 'webm';
+
+    var entry = {
+        id: ++audioIdCounter,
+        name: 'Alarme ' + config.name,
+        type: typeKey,
+        typeName: config.name,
+        blob: blob,
+        mimeType: blob.type,
+        ext: ext,
+        duration: config.duration,
+        size: blob.size,
+        createdAt: new Date().toISOString()
+    };
+
+    savedAudios.push(entry);
+    await dbPut('audios', entry);
+    renderAudioBank();
+    showToast('Audio "' + config.name + '" salvo', 'success');
+}
+
+/* ========================================
+   AUTO-SALVAR QUANDO ALARME DISPARA
+   ======================================== */
+async function autoSaveAudio(alarm) {
+    if (savedAudios.length >= 30) return;
+    var blob = await recordSound('padrao');
+    if (!blob) return;
+    var ext = blob.type.indexOf('mp4') !== -1 ? 'mp4' : 'webm';
+    var entry = {
+        id: ++audioIdCounter,
+        name: 'Auto: ' + alarm.label,
+        type: 'padrao',
+        typeName: 'Padrao (auto)',
+        blob: blob,
+        mimeType: blob.type,
+        ext: ext,
+        duration: SOUND_TYPES.padrao.duration,
+        size: blob.size,
+        createdAt: new Date().toISOString()
+    };
+    savedAudios.push(entry);
+    await dbPut('audios', entry);
+    renderAudioBank();
+}
+
+/* ========================================
+   DESENHAR WAVEFORM DO AUDIO
+   ======================================== */
+function drawWaveform(canvas, blob, typeKey) {
+    var ctx2d = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    ctx2d.clearRect(0, 0, w, h);
+
+    blob.arrayBuffer().then(function(buf) {
+        var tempCtx = new (window.AudioContext || window.webkitAudioContext)();
+        tempCtx.decodeAudioData(buf, function(audioBuf) {
+            var data = audioBuf.getChannelData(0);
+            tempCtx.close().catch(function() {});
+            var bars = 24;
+            var step = Math.max(1, Math.floor(data.length / bars));
+            for (var i = 0; i < bars; i++) {
+                var sum = 0;
+                for (var j = 0; j < step; j++) sum += Math.abs(data[i * step + j] || 0);
+                var avg = sum / step;
+                var barH = Math.max(2, avg * h * 2.5);
+                var x = (i / bars) * w;
+                var y = (h - barH) / 2;
+                ctx2d.fillStyle = 'rgba(232,168,73,' + Math.min(1, 0.4 + avg * 2) + ')';
+                ctx2d.fillRect(x + 1, y, Math.max(1, w / bars - 2), barH);
+            }
+        }, function() {
+            drawFallback(ctx2d, w, h, typeKey);
+        });
+    }).catch(function() {
+        drawFallback(ctx2d, w, h, typeKey);
+    });
+}
+
+function drawFallback(ctx2d, w, h, typeKey) {
+    var config = SOUND_TYPES[typeKey];
+    if (!config) return;
+    var bars = 24;
+    for (var i = 0; i < bars; i++) {
+        var noteIdx = Math.floor((i / bars) * config.notes.length);
+        var note = config.notes[noteIdx];
+        var barH = Math.max(4, (note.vol / 0.35) * h * (0.3 + Math.random() * 0.7));
+        var x = (i / bars) * w;
+        var y = (h - barH) / 2;
+        ctx2d.fillStyle = 'rgba(232,168,73,' + (0.3 + Math.random() * 0.5) + ')';
+        ctx2d.fillRect(x + 1, y, Math.max(1, w / bars - 2), barH);
+    }
+}
+
+/* ========================================
+   RENDERIZAR BANCO DE AUDIO
+   ======================================== */
+function renderAudioBank() {
+    $('audioCount').textContent = savedAudios.length;
+    var grid = $('audioGrid');
+
+    if (savedAudios.length === 0) {
+        grid.innerHTML = '';
+        var es = document.createElement('div');
+        es.classList.add('empty-state');
+        es.innerHTML = '<i class="fas fa-volume-mute"></i><p>Nenhum audio salvo</p>';
+        grid.appendChild(es);
+        return;
+    }
+
+    grid.innerHTML = '';
+    savedAudios.forEach(function(audio) {
+        var card = document.createElement('div');
+        card.classList.add('audio-card');
+
+        var sizeKB = (audio.size / 1024).toFixed(1);
+        var d = new Date(audio.createdAt);
+        var dateStr = String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+
+        card.innerHTML =
+            '<div class="audio-waveform"><canvas width="160" height="80" data-aid="' + audio.id + '"></canvas></div>' +
+            '<div class="audio-info">' +
+                '<div class="audio-name">' + escapeHTML(audio.name) + '</div>' +
+                '<div class="audio-meta">' +
+                    '<span><i class="fas fa-tag"></i> ' + escapeHTML(audio.typeName) + '</span>' +
+                    '<span><i class="fas fa-clock"></i> ' + (audio.duration / 1000).toFixed(1) + 's</span>' +
+                    '<span><i class="fas fa-hdd"></i> ' + sizeKB + 'KB</span>' +
+                '</div>' +
+                '<div class="audio-meta"><span><i class="fas fa-calendar"></i> ' + dateStr + '</span></div>' +
+            '</div>' +
+            '<div class="audio-actions">' +
+                '<button class="btn-audio-action play" data-id="' + audio.id + '" title="Reproduzir"><i class="fas fa-play"></i></button>' +
+                '<button class="btn-audio-action download" data-id="' + audio.id + '" title="Baixar"><i class="fas fa-download"></i></button>' +
+                '<button class="btn-audio-action delete" data-id="' + audio.id + '" title="Excluir"><i class="fas fa-trash"></i></button>' +
+            '</div>';
+
+        grid.appendChild(card);
+
+        // Desenhar waveform
+        var canvas = card.querySelector('canvas[data-aid="' + audio.id + '"]');
+        if (canvas && audio.blob) drawWaveform(canvas, audio.blob, audio.type);
+    });
+
+    // Play
+    grid.querySelectorAll('.btn-audio-action.play').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = parseInt(btn.dataset.id);
+            var audio = savedAudios.find(function(a) { return a.id === id; });
+            if (!audio || !audio.blob) return;
+
+            // Parar anterior
+            if (currentlyPlayingAudio) {
+                currentlyPlayingAudio.pause();
+                currentlyPlayingAudio = null;
+            }
+            grid.querySelectorAll('.btn-audio-action.play i').forEach(function(ic) { ic.className = 'fas fa-play'; });
+
+            var url = URL.createObjectURL(audio.blob);
+            var el = new Audio(url);
+            currentlyPlayingAudio = el;
+            btn.querySelector('i').className = 'fas fa-pause';
+
+            el.play().catch(function() {
+                btn.querySelector('i').className = 'fas fa-play';
+                currentlyPlayingAudio = null;
+            });
+
+            el.onended = function() {
+                btn.querySelector('i').className = 'fas fa-play';
+                currentlyPlayingAudio = null;
+                URL.revokeObjectURL(url);
+            };
+            el.onerror = function() {
+                btn.querySelector('i').className = 'fas fa-play';
+                currentlyPlayingAudio = null;
+                URL.revokeObjectURL(url);
+            };
+        });
+    });
+
+    // Download
+    grid.querySelectorAll('.btn-audio-action.download').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = parseInt(btn.dataset.id);
+            var audio = savedAudios.find(function(a) { return a.id === id; });
+            if (!audio || !audio.blob) return;
+
+            var url = URL.createObjectURL(audio.blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = audio.name.replace(/\s+/g, '_') + '_' + audio.id + '.' + audio.ext;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+            showToast('"' + audio.name + '" baixado', 'info');
+        });
+    });
+
+    // Delete
+    grid.querySelectorAll('.btn-audio-action.delete').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var id = parseInt(btn.dataset.id);
+            savedAudios = savedAudios.filter(function(a) { return a.id !== id; });
+            dbDelete('audios', id);
             renderAudioBank();
-            showToast(`Audio "${config.name}" salvo no banco`, 'success');
-            return audioEntry;
-        }
-
-        // ===== Desenhar waveform =====
-        async function drawWaveform(canvas, blob, typeKey) {
-            const ctx2d = canvas.getContext('2d');
-            const w = canvas.width, h = canvas.height;
-            ctx2d.clearRect(0, 0, w, h);
-            try {
-                const tempCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const buf = await blob.arrayBuffer();
-                const audioBuf = await tempCtx.decodeAudioData(buf);
-                const data = audioBuf.getChannelData(0);
-                tempCtx.close().catch(() => {});
-                const bars = 24;
-                const step = Math.floor(data.length / bars);
-                for (let i = 0; i < bars; i++) {
-                    let sum = 0;
-                    for (let j = 0; j < step; j++) sum += Math.abs(data[i * step + j] || 0);
-                    const avg = sum / step;
-                    const barH = Math.max(2, avg * h * 2.5);
-                    const x = (i / bars) * w;
-                    const y = (h - barH) / 2;
-                    ctx2d.fillStyle = `rgba(232,168,73,${0.4 + avg * 2})`;
-                    ctx2d.fillRect(x + 1, y, Math.max(1, w / bars - 2), barH);
-                }
-            } catch {
-                // Fallback decorativo
-                const bars = 24;
-                const config = SOUND_TYPES[typeKey];
-                for (let i = 0; i < bars; i++) {
-                    const noteIdx = Math.floor((i / bars) * config.notes.length);
-                    const note = config.notes[noteIdx];
-                    const barH = Math.max(4, (note.vol / 0.35) * h * (0.3 + Math.random() * 0.7));
-                    const x = (i / bars) * w;
-                    const y = (h - barH) / 2;
-                    ctx2d.fillStyle = `rgba(232,168,73,${0.3 + Math.random() * 0.5})`;
-                    ctx2d.fillRect(x + 1, y, Math.max(1, w / bars - 2), barH);
-                }
-            }
-        }
-
-        // ===== Renderizar banco de audio =====
-        function renderAudioBank() {
-            audioCount.textContent = savedAudios.length;
-            if (savedAudios.length === 0) {
-                audioGrid.innerHTML = '';
-                audioGrid.appendChild(audioEmptyState);
-                audioEmptyState.style.display = 'block';
-                return;
-            }
-            audioEmptyState.style.display = 'none';
-            audioGrid.innerHTML = '';
-            savedAudios.forEach(audio => {
-                const card = document.createElement('div');
-                card.classList.add('audio-card');
-                const sizeKB = (audio.size / 1024).toFixed(1);
-                const date = new Date(audio.createdAt);
-                const dateStr = `${String(date.getDate()).padStart(2,'0')}/${String(date.getMonth()+1).padStart(2,'0')}/${date.getFullYear()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
-                card.innerHTML = `
-                    <div class="audio-waveform"><canvas width="160" height="80" data-audio-id="${audio.id}"></canvas></div>
-                    <div class="audio-info">
-                        <div class="audio-name">${escapeHTML(audio.name)}</div>
-                        <div class="audio-meta">
-                            <span><i class="fas fa-tag"></i> ${escapeHTML(audio.typeName)}</span>
-                            <span><i class="fas fa-clock"></i> ${(audio.duration/1000).toFixed(1)}s</span>
-                            <span><i class="fas fa-hdd"></i> ${sizeKB}KB</span>
-                        </div>
-                        <div class="audio-meta"><span><i class="fas fa-calendar"></i> ${dateStr}</span></div>
-                    </div>
-                    <div class="audio-actions">
-                        <button class="btn-audio-action play" data-id="${audio.id}" title="Reproduzir" aria-label="Reproduzir audio"><i class="fas fa-play"></i></button>
-                        <button class="btn-audio-action download" data-id="${audio.id}" title="Baixar" aria-label="Baixar audio"><i class="fas fa-download"></i></button>
-                        <button class="btn-audio-action delete" data-id="${audio.id}" title="Excluir" aria-label="Excluir audio"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-                audioGrid.appendChild(card);
-                // Desenhar waveform
-                const canvas = card.querySelector(`canvas[data-audio-id="${audio.id}"]`);
-                drawWaveform(canvas, audio.blob, audio.type);
-            });
-            // Eventos
-            audioGrid.querySelectorAll('.btn-audio-action.play').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = parseInt(btn.dataset.id);
-                    const audio = savedAudios.find(a => a.id === id);
-                    if (!audio) return;
-                    // Parar audio anterior
-                    if (currentlyPlayingAudio) { currentlyPlayingAudio.pause(); currentlyPlayingAudio = null; }
-                    audioGrid.querySelectorAll('.btn-audio-action.play i').forEach(i => i.className = 'fas fa-play');
-                    const url = URL.createObjectURL(audio.blob);
-                    const audioEl = new Audio(url);
-                    currentlyPlayingAudio = audioEl;
-                    btn.querySelector('i').className = 'fas fa-pause';
-                    audioEl.play().catch(() => {});
-                    audioEl.onended = () => { btn.querySelector('i').className = 'fas fa-play'; currentlyPlayingAudio = null; URL.revokeObjectURL(url); };
-                    audioEl.onerror = () => { btn.querySelector('i').className = 'fas fa-play'; currentlyPlayingAudio = null; URL.revokeObjectURL(url); };
-                });
-            });
-            audioGrid.querySelectorAll('.btn-audio-action.download').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = parseInt(btn.dataset.id);
-                    const audio = savedAudios.find(a => a.id === id);
-                    if (!audio) return;
-                    const url = URL.createObjectURL(audio.blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `${audio.name.replace(/\s+/g, '_')}_${audio.id}.${audio.ext}`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    setTimeout(() => URL.revokeObjectURL(url), 5000);
-                    showToast(`"${audio.name}" baixado`, 'info');
-                });
-            });
-            audioGrid.querySelectorAll('.btn-audio-action.delete').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = parseInt(btn.dataset.id);
-                    savedAudios = savedAudios.filter(a => a.id !== id);
-                    await dbDelete('audios', id);
-                    renderAudioBank();
-                    showToast('Audio removido', 'error');
-                });
-            });
-        }
-
-        // ===== Botoes de gravacao =====
-        let isRecording = false;
-
-        btnRecord.addEventListener('click', async () => {
-            if (isRecording) return;
-            if (savedAudios.length >= 30) { showToast('Limite de 30 audios. Exclua alguns.', 'error'); return; }
-            isRecording = true;
-            btnRecord.classList.add('recording');
-            btnRecord.innerHTML = '<i class="fas fa-circle" style="animation:blink 0.5s step-end infinite"></i> Gravando...';
-            const typeKey = soundTypeSelect.value;
-            const blob = await recordSound(typeKey);
-            isRecording = false;
-            btnRecord.classList.remove('recording');
-            btnRecord.innerHTML = '<i class="fas fa-circle"></i> Gravar e Salvar';
-            if (blob) await saveRecordedAudio(typeKey, blob);
+            showToast('Audio removido', 'error');
         });
+    });
+}
 
-        btnRecordAll.addEventListener('click', async () => {
-            if (isRecording) return;
-            const types = Object.keys(SOUND_TYPES);
-            const toRecord = types.filter(t => !savedAudios.some(a => a.type === t));
-            if (toRecord.length === 0) { showToast('Todos os tipos ja foram gravados', 'info'); return; }
-            if (savedAudios.length + toRecord.length > 30) { showToast('Limite de 30 audios atingido', 'error'); return; }
-            isRecording = true;
-            btnRecordAll.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gravando...';
-            btnRecordAll.style.pointerEvents = 'none';
-            for (const typeKey of toRecord) {
-                const blob = await recordSound(typeKey);
-                if (blob) await saveRecordedAudio(typeKey, blob);
-                await new Promise(r => setTimeout(r, 500));
-            }
-            isRecording = false;
-            btnRecordAll.innerHTML = '<i class="fas fa-layer-group"></i> Gravar Todos';
-            btnRecordAll.style.pointerEvents = '';
-            showToast(`${toRecord.length} audio(s) gravado(s) com sucesso`, 'success');
-        });
+/* ========================================
+   BOTOES DE GRAVACAO
+   ======================================== */
+ $('btnRecord').addEventListener('click', async function() {
+    if (isRecording) return;
+    if (savedAudios.length >= 30) { showToast('Limite de 30 audios', 'error'); return; }
 
-        // ===== Adicionar alarme =====
-        btnAdd.addEventListener('click', async () => {
-            ensureAudioCtx();
-            requestNotifPermission();
-            const h = pickerHours, m = pickerMinutes;
-            const label = alarmLabelInput.value.trim() || 'Alarme';
-            const voiceName = voiceSelect.value || '';
-            const customMsg = alarmMessageInput.value.trim();
-            const message = customMsg || getSmartMessage(h, m);
-            const alarm = {
-                id: ++alarmIdCounter, hours: h, minutes: m,
-                label, voiceName, message, enabled: true, triggered: false
-            };
-            alarms.push(alarm);
-            await dbPut('alarms', alarm);
-            renderAlarms();
-            showAlarmNotify(alarm);
-            alarmLabelInput.value = '';
-            alarmMessageInput.value = '';
-        });
+    isRecording = true;
+    var btn = $('btnRecord');
+    btn.classList.add('recording');
+    btn.innerHTML = '<i class="fas fa-circle" style="animation:blink 0.5s step-end infinite"></i> Gravando...';
 
-        // ===== Renderizar alarmes =====
-        function renderAlarms() {
-            alarmCount.textContent = alarms.length;
-            if (alarms.length === 0) {
-                alarmsList.innerHTML = '';
-                alarmsList.appendChild(emptyState);
-                emptyState.style.display = 'block';
-                return;
-            }
-            emptyState.style.display = 'none';
-            alarmsList.innerHTML = '';
-            alarms.forEach(alarm => {
-                const card = document.createElement('div');
-                card.classList.add('alarm-card');
-                card.id = `alarm-${alarm.id}`;
-                if (alarm.enabled) card.classList.add('active');
-                if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) card.classList.add('ringing');
-                card.innerHTML = `
-                    <div class="alarm-time-display">${String(alarm.hours).padStart(2,'0')}:${String(alarm.minutes).padStart(2,'0')}</div>
-                    <div class="alarm-info">
-                        <div class="alarm-label-text">${escapeHTML(alarm.label)}</div>
-                        <div class="alarm-msg-preview">${escapeHTML(alarm.message)}</div>
-                        <span class="alarm-voice-badge"><i class="fas fa-microphone"></i> Voz IA</span>
-                    </div>
-                    <div class="alarm-actions">
-                        <div class="toggle ${alarm.enabled ? 'on' : ''}" data-id="${alarm.id}" tabindex="0" role="switch" aria-checked="${alarm.enabled}" aria-label="Ativar ou desativar"></div>
-                        <button class="btn-delete" data-id="${alarm.id}" aria-label="Excluir"><i class="fas fa-trash"></i></button>
-                    </div>
-                `;
-                alarmsList.appendChild(card);
-            });
-            document.querySelectorAll('.toggle').forEach(toggle => {
-                const handler = async () => {
-                    const id = parseInt(toggle.dataset.id);
-                    const alarm = alarms.find(a => a.id === id);
-                    if (alarm) { alarm.enabled = !alarm.enabled; alarm.triggered = false; await dbPut('alarms', alarm); renderAlarms(); }
-                };
-                toggle.addEventListener('click', handler);
-                toggle.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); } });
-            });
-            document.querySelectorAll('.btn-delete').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const id = parseInt(btn.dataset.id);
-                    alarms = alarms.filter(a => a.id !== id);
-                    await dbDelete('alarms', id);
-                    renderAlarms();
-                    showToast('Alarme removido', 'error');
-                });
-            });
-        }
+    var typeKey = $('soundTypeSelect').value;
+    var blob = await recordSound(typeKey);
 
-        // ===== Verificar alarmes =====
-        let lastCheckedKey = '';
-        function checkAlarms(now) {
-            if (now.getSeconds() > 3) return;
-            const key = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-            if (key === lastCheckedKey) return;
-            alarms.forEach(alarm => {
-                if (!alarm.enabled || alarm.triggered) return;
-                if (alarm.hours === now.getHours() && alarm.minutes === now.getMinutes()) {
-                    alarm.triggered = true;
-                    lastCheckedKey = key;
-                    triggerAlarm(alarm);
-                }
-            });
-        }
+    isRecording = false;
+    btn.classList.remove('recording');
+    btn.innerHTML = '<i class="fas fa-circle"></i> Gravar e Salvar';
 
-        // ===== Disparar alarme =====
-        function triggerAlarm(alarm) {
-            currentRingingAlarm = alarm;
-            renderAlarms();
-            overlayTime.textContent = `${String(alarm.hours).padStart(2,'0')}:${String(alarm.minutes).padStart(2,'0')}`;
-            overlayLabel.textContent = alarm.label;
-            alarmOverlay.classList.add('show');
-            ensureAudioCtx();
-            startBeep();
-            // Salvar audio automaticamente no banco quando disparar
-            autoSaveAudio(alarm);
-            setTimeout(() => { if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) speakAlarmLoop(alarm); }, 600);
-        }
+    if (blob) await saveRecordedAudio(typeKey, blob);
+    else showToast('Falha ao gravar', 'error');
+});
 
-        // ===== Auto-salvar audio quando alarme dispara =====
-        async function autoSaveAudio(alarm) {
-            if (savedAudios.length >= 30) return;
-            const blob = await recordSound('padrao');
-            if (blob) {
-                const entry = {
-                    id: ++audioIdCounter,
-                    name: `Auto: ${alarm.label}`,
-                    type: 'padrao', typeName: 'Padrao (auto)',
-                    blob, mimeType: blob.type, ext: blob.type.includes('mp4') ? 'mp4' : 'webm',
-                    duration: SOUND_TYPES.padrao.duration, size: blob.size,
-                    createdAt: new Date().toISOString()
-                };
-                savedAudios.push(entry);
-                await dbPut('audios', { ...entry, blob });
-                renderAudioBank();
-            }
-        }
+ $('btnRecordAll').addEventListener('click', async function() {
+    if (isRecording) return;
 
-        // ===== Falar em loop =====
-        function speakAlarmLoop(alarm) {
-            if (!currentRingingAlarm || currentRingingAlarm.id !== alarm.id) return;
-            speechSynthesis.cancel();
-            const u = new SpeechSynthesisUtterance(alarm.message);
-            u.rate = 0.92; u.pitch = 1.15; u.volume = 1;
-            const allV = speechSynthesis.getVoices();
-            if (alarm.voiceName) { const f = allV.find(v => v.name === alarm.voiceName); if (f) u.voice = f; }
-            else if (selectedVoice) u.voice = selectedVoice;
-            u.onstart = () => { isSpeaking = true; speakingIndicator.style.display = 'flex'; };
-            u.onend = () => {
-                isSpeaking = false; speakingIndicator.style.display = 'none';
-                if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) speakLoopTimer = setTimeout(() => speakAlarmLoop(alarm), 4000);
-            };
-            u.onerror = () => {
-                isSpeaking = false; speakingIndicator.style.display = 'none';
-                if (currentRingingAlarm && currentRingingAlarm.id === alarm.id) speakLoopTimer = setTimeout(() => speakAlarmLoop(alarm), 3000);
-            };
-            speechSynthesis.speak(u);
-            // Chrome bug fix
-            const keepAlive = setInterval(() => {
-                if (!currentRingingAlarm || currentRingingAlarm.id !== alarm.id) { clearInterval(keepAlive); return; }
-                if (speechSynthesis.speaking && !speechSynthesis.pending) { speechSynthesis.pause(); speechSynthesis.resume(); }
-            }, 10000);
-        }
+    var types = Object.keys(SOUND_TYPES);
+    var toRecord = types.filter(function(t) { return !savedAudios.some(function(a) { return a.type === t; }); });
 
-        // ===== Beep =====
-        function startBeep() {
-            stopBeep();
-            if (!audioCtx) return;
-            (function cycle() {
-                if (!currentRingingAlarm) return;
-                for (let i = 0; i < 3; i++) {
-                    setTimeout(() => {
-                        if (!currentRingingAlarm) return;
-                        try {
-                            const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-                            o.connect(g); g.connect(audioCtx.destination);
-                            o.type = 'sine';
-                            const t = audioCtx.currentTime;
-                            o.frequency.setValueAtTime(880, t); o.frequency.setValueAtTime(1100, t + 0.08);
-                            g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
-                            o.start(t); o.stop(t + 0.25);
-                        } catch {}
-                    }, i * 380);
-                }
-                if (currentRingingAlarm) beepTimeout = setTimeout(cycle, 1800);
-            })();
-        }
-        function stopBeep() { if (beepTimeout) { clearTimeout(beepTimeout); beepTimeout = null; } if (speakLoopTimer) { clearTimeout(speakLoopTimer); speakLoopTimer = null; } }
+    if (toRecord.length === 0) { showToast('Todos os tipos ja gravados', 'info'); return; }
+    if (savedAudios.length + toRecord.length > 30) { showToast('Limite de 30 audios', 'error'); return; }
 
-        // ===== Desativar =====
-        function dismissAlarm() {
-            speechSynthesis.cancel(); stopBeep(); isSpeaking = false;
-            if (currentRingingAlarm) { currentRingingAlarm.triggered = false; currentRingingAlarm = null; }
-            alarmOverlay.classList.remove('show');
-            speakingIndicator.style.display = 'none';
-            lastCheckedKey = '';
-            renderAlarms();
-            showToast('Alarme desativado', 'success');
-        }
-        btnDismiss.addEventListener('click', dismissAlarm);
+    isRecording = true;
+    var btn = $('btnRecordAll');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gravando...';
+    btn.style.pointerEvents = 'none';
 
-        // ===== Adiar =====
-        btnSnooze.addEventListener('click', async () => {
-            speechSynthesis.cancel(); stopBeep(); isSpeaking = false;
-            if (currentRingingAlarm) {
-                let nm = currentRingingAlarm.minutes + 5, nh = currentRingingAlarm.hours;
-                if (nm >= 60) { nm -= 60; nh = (nh + 1) % 24; }
-                currentRingingAlarm.hours = nh; currentRingingAlarm.minutes = nm;
-                currentRingingAlarm.message = getSmartMessage(nh, nm);
-                currentRingingAlarm.triggered = false; currentRingingAlarm.enabled = true;
-                await dbPut('alarms', currentRingingAlarm);
-                const label = currentRingingAlarm.label;
-                currentRingingAlarm = null;
-                alarmOverlay.classList.remove('show');
-                speakingIndicator.style.display = 'none';
-                lastCheckedKey = '';
-                renderAlarms();
-                showToast(`"${label}" adiado para ${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`, 'info');
-            }
-        });
+    for (var i = 0; i < toRecord.length; i++) {
+        var blob = await recordSound(toRecord[i]);
+        if (blob) await saveRecordedAudio(toRecord[i], blob);
+        await new Promise(function(r) { setTimeout(r, 500); });
+    }
 
-        // ===== Escape =====
-        document.addEventListener('keydown', e => { if (e.key === 'Escape' && currentRingingAlarm) dismissAlarm(); });
+    isRecording = false;
+    btn.innerHTML = '<i class="fas fa-layer-group"></i> Gravar Todos';
+    btn.style.pointerEvents = '';
+    showToast(toRecord.length + ' audio(s) gravado(s)', 'success');
+});
 
-        // ===== Toast =====
-        function showToast(message, type = 'success') {
-            const t = document.createElement('div');
-            t.classList.add('toast', type);
-            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
-            t.innerHTML = `<i class="fas ${icons[type] || icons.success}"></i> ${escapeHTML(message)}`;
-            toastContainer.appendChild(t);
-            setTimeout(() => { t.style.animation = 'toastOut 0.3s ease-in forwards'; setTimeout(() => t.remove(), 300); }, 3000);
-        }
-
-        // ===== Utilidade =====
-        function escapeHTML(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
-
-        // ===== Inicializar =====
-        loadSavedData();
-    </script>
+/* ========================================
+   INICIALIZAR
+   ======================================== */
+loadSavedData();
+</script>
 </body>
 </html>
